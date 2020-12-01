@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/HomeBudgetMetrics.dart';
-import 'package:home_budget_app/home/model/HomeBudgetOverview.dart';
-import 'package:home_budget_app/home/redux/BudgetAppState.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
+import 'package:home_budget_app/home/ui/home_budget_metrics.dart';
 
 class SummaryCards extends StatefulWidget {
-  final HomeBudgetMetrics budgetMetrics;
-  final HomeBudgetOverview selectedMonthRecord;
-
-  SummaryCards(
+  const SummaryCards(
       {Key key, @required this.budgetMetrics, this.selectedMonthRecord})
       : super(key: key);
+
+  final HomeBudgetMetrics budgetMetrics;
+  final HomeBudgetOverview selectedMonthRecord;
 
   @override
   _SummaryCardsState createState() => _SummaryCardsState();
@@ -26,7 +24,7 @@ class _SummaryCardsState extends State<SummaryCards> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "Home Budget Plan for Month of: ${null == widget.selectedMonthRecord ? 'N/A' : widget.selectedMonthRecord.displayName}",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         )
@@ -45,12 +43,12 @@ class _SummaryCardsState extends State<SummaryCards> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _getSummaryCard(context, Icons.payments_outlined, Colors.green,
-                  "Income", widget.budgetMetrics.totalIncome),
+                  'Income', widget.budgetMetrics.totalIncome),
               _getSummaryCard(
                   context,
                   Icons.payments_outlined,
                   Colors.redAccent,
-                  "Expend",
+                  'Expend',
                   widget.budgetMetrics.totalSpentAmount),
             ],
           ),
@@ -58,7 +56,7 @@ class _SummaryCardsState extends State<SummaryCards> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _getSummaryCard(context, Icons.account_balance_wallet,
-                  Colors.blue, "Balance", widget.budgetMetrics.remainingAmount)
+                  Colors.blue, 'Balance', widget.budgetMetrics.remainingAmount)
             ],
           ),
         ],
@@ -76,7 +74,7 @@ class _SummaryCardsState extends State<SummaryCards> {
         child: Card(
           elevation: 5,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -94,16 +92,16 @@ class _SummaryCardsState extends State<SummaryCards> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: new RichText(
-                  text: new TextSpan(
-                      style: new TextStyle(
+                child: RichText(
+                  text: TextSpan(
+                      style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.bold),
                       children: [
-                        new TextSpan(
-                            text: "$transType: ",
-                            style: TextStyle(color: Colors.black)),
-                        new TextSpan(
-                            text: "$_rupeeSymbol $amount",
+                        TextSpan(
+                            text: '$transType: ',
+                            style: const TextStyle(color: Colors.black)),
+                        TextSpan(
+                            text: '$_rupeeSymbol $amount',
                             style: TextStyle(color: color))
                       ]),
                 ),
@@ -115,5 +113,5 @@ class _SummaryCardsState extends State<SummaryCards> {
     );
   }
 
-  static String _rupeeSymbol = new String.fromCharCodes(new Runes(' \u{20B9}'));
+  static final String _rupeeSymbol = String.fromCharCodes(Runes(' \u{20B9}'));
 }

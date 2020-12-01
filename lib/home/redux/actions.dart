@@ -1,56 +1,56 @@
-import 'package:home_budget_app/home/BudgetDetails.dart';
-import 'package:home_budget_app/home/model/HomeBudgetOverview.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
 
 class AddNewRecord {
-  final BudgetDetails record;
-
   AddNewRecord({this.record});
+
+  final BudgetDetails record;
 }
 
 class FetchMonthlyRecords {
-  final List<BudgetDetails> list;
-
   FetchMonthlyRecords({this.list});
+
+  final List<BudgetDetails> list;
 }
 
 class MonthRecords {
-  final List<HomeBudgetOverview> list;
-
   MonthRecords({this.list});
+
+  final List<HomeBudgetOverview> list;
 }
 
 class SelectedMonth {
-  final HomeBudgetOverview selectedRecord;
-
   SelectedMonth({this.selectedRecord});
+
+  final HomeBudgetOverview selectedRecord;
 }
 
 class DeleteRecord {
-  final BudgetDetails record;
-
   DeleteRecord({this.record});
+
+  final BudgetDetails record;
 }
 
 class ShowLoadingIndicator {
-  final bool showIndicator;
-
   ShowLoadingIndicator({this.showIndicator});
+
+  final bool showIndicator;
 }
 
 class EditRecord {
-  final BudgetDetails record;
-
   EditRecord({this.record});
+
+  final BudgetDetails record;
 }
 
 class ValidCreateNewBudget {
-  final bool isValid;
-
   ValidCreateNewBudget(this.isValid);
+
+  final bool isValid;
 }
 
 class InsertHomeBudgetOverview {
-  final HomeBudgetOverview budgetOverview;
-
   InsertHomeBudgetOverview(this.budgetOverview);
+
+  final HomeBudgetOverview budgetOverview;
 }

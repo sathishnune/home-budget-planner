@@ -2,17 +2,18 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 
 class BudgetData {
+  const BudgetData(this.category, this.cost, this.color);
+
   final String category;
   final int cost;
   final charts.Color color;
-
-  const BudgetData(this.category, this.cost, this.color);
 }
 
 class BudgetPieChart extends StatefulWidget {
-  final List<BudgetData> budgetDetails;
+  const BudgetPieChart({Key key, @required this.budgetDetails})
+      : super(key: key);
 
-  BudgetPieChart({Key key, @required this.budgetDetails}) : super(key: key);
+  final List<BudgetData> budgetDetails;
 
   @override
   _BudgetPieChart createState() => _BudgetPieChart();
@@ -20,13 +21,14 @@ class BudgetPieChart extends StatefulWidget {
 
 class _BudgetPieChart extends State<BudgetPieChart> {
   // Chart configs.
-  bool _animate = true;
-  double _arcRatio = 0.8;
-  charts.BehaviorPosition _legendPosition = charts.BehaviorPosition.bottom;
+  final bool _animate = true;
+  final double _arcRatio = 0.8;
+  final charts.BehaviorPosition _legendPosition =
+      charts.BehaviorPosition.bottom;
 
   @override
   Widget build(BuildContext context) {
-    return charts.PieChart(
+    return charts.PieChart<dynamic>(
       [
         charts.Series<BudgetData, String>(
           id: 'budgetAppChart',
@@ -39,11 +41,12 @@ class _BudgetPieChart extends State<BudgetPieChart> {
               '${row.category}: ${row.cost}',
         ),
       ],
-      animate: this._animate,
-      defaultRenderer: charts.ArcRendererConfig(
-        arcRatio: this._arcRatio,
+      animate: _animate,
+      defaultRenderer: charts.ArcRendererConfig<dynamic>(
+        arcRatio: _arcRatio,
         arcRendererDecorators: [
-          charts.ArcLabelDecorator(labelPosition: charts.ArcLabelPosition.auto)
+          charts.ArcLabelDecorator<dynamic>(
+              labelPosition: charts.ArcLabelPosition.auto)
         ],
       ),
       behaviors: [
@@ -54,7 +57,7 @@ class _BudgetPieChart extends State<BudgetPieChart> {
         ),
         // Add legend. ("Datum" means the "X-axis" of each data point.)
         charts.DatumLegend(
-          position: this._legendPosition,
+          position: _legendPosition,
           desiredMaxRows: 2,
         ),
       ],

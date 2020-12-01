@@ -1,10 +1,10 @@
 class HomeBudgetOverview {
+  HomeBudgetOverview({this.id, this.month, this.year, this.displayName});
+
   String id;
   int month;
   int year;
   String displayName;
-
-  HomeBudgetOverview({this.id, this.month, this.year, this.displayName});
 
   Map<String, dynamic> toMap() {
     return {

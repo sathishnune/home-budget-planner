@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/redux/BudgetAppState.dart';
+import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
-
-import 'CreateNewBudget.dart';
-import 'PopUpMenuItems.dart';
+import 'package:home_budget_app/home/ui/create_new_budget.dart';
+import 'package:home_budget_app/home/ui/popup_menu_items.dart';
+import 'package:redux/src/store.dart';
 
 class PopupMenuItems extends StatefulWidget {
   @override
@@ -12,20 +12,18 @@ class PopupMenuItems extends StatefulWidget {
 }
 
 class _PopupMenuItemsState extends State<PopupMenuItems> {
-  MyHomePopUpMenuItem selectedItem;
-
   @override
   Widget build(BuildContext context) {
-    var state = StoreProvider.of<BudgetAppState>(context);
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
     return PopupMenuButton<MyHomePopUpMenuItem>(
       onSelected: (MyHomePopUpMenuItem result) {
         setState(() {
-          selectedItem = result;
-          state.dispatch(ValidCreateNewBudget(true));
-          showDialog(
+          _state.dispatch(ValidCreateNewBudget(true));
+          showDialog<SimpleDialog>(
               context: context,
-              builder: (context) => SimpleDialog(
-                    title: Text('Create New Month Budget Plan'),
+              builder: (BuildContext context) => SimpleDialog(
+                    title: const Text('Create New Month Budget Plan'),
                     children: [CreateNewMonthlyBudget()],
                   ));
         });

@@ -1,22 +1,22 @@
 import 'dart:async';
 
-import 'package:home_budget_app/home/model/HomeBudgetMonthlyDetails.dart';
-import 'package:home_budget_app/home/model/HomeBudgetOverview.dart';
+import 'package:home_budget_app/home/model/home_budget_monthly_details.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBUtils {
-  static const DB_NAME = 'home_budget_database.db';
+  static const String DB_NAME = 'home_budget_database.db';
 
-  static const TABLE_HOME_BUDGET_OVERVIEW = 'HOME_BUDGET_OVERVIEW';
-  static const TABLE_HOME_BUDGET_MONTHLY_DETAILS =
+  static const String TABLE_HOME_BUDGET_OVERVIEW = 'HOME_BUDGET_OVERVIEW';
+  static const String TABLE_HOME_BUDGET_MONTHLY_DETAILS =
       'HOME_BUDGET_MONTHLY_DETAILS';
 
-  static const SQL_CREATE_HOME_DETAILS_OVERVIEW =
+  static const String SQL_CREATE_HOME_DETAILS_OVERVIEW =
       'CREATE TABLE HOME_BUDGET_OVERVIEW(id TEXT PRIMARY KEY, month INTEGER, '
       'year INTEGER, display_name TEXT)';
 
-  static const SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS =
+  static const String SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS =
       'CREATE TABLE HOME_BUDGET_MONTHLY_DETAILS(id TEXT PRIMARY KEY, '
       'title TEXT, amount INTEGER, trans_type TEXT, '
       'month_ref TEXT, FOREIGN KEY (month_ref) REFERENCES '
@@ -25,7 +25,7 @@ class DBUtils {
   static Future<Database> database() async {
     return openDatabase(
         join(await getDatabasesPath(), 'home_budget_database.db'),
-        onCreate: (db, version) => _createTables(db),
+        onCreate: (Database db, int version) => _createTables(db),
         version: 1);
   }
 
@@ -58,7 +58,7 @@ class DBUtils {
       HomeBudgetMonthlyDetails monthlyDetails) async {
     final Database db = await database();
     await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS, monthlyDetails.toMap(),
-        where: "id = ?", whereArgs: [monthlyDetails.id]);
+        where: 'id = ?', whereArgs: <String>[monthlyDetails.id]);
   }
 
   static Future<List<HomeBudgetMonthlyDetails>> monthlyDetails(
@@ -66,9 +66,9 @@ class DBUtils {
     final Database db = await database();
     final List<Map<String, dynamic>> maps = await db.query(
         TABLE_HOME_BUDGET_MONTHLY_DETAILS,
-        where: "month_ref = ?",
-        whereArgs: [monthRefId]);
-    return List.generate(maps.length, (i) {
+        where: 'month_ref = ?',
+        whereArgs: <String>[monthRefId]);
+    return List.generate(maps.length, (int i) {
       return HomeBudgetMonthlyDetails(
         id: maps[i]['id'],
         title: maps[i]['title'],
@@ -82,7 +82,7 @@ class DBUtils {
   static Future<List<HomeBudgetOverview>> budgetOverviews() async {
     final Database db = await database();
     final List<Map<String, dynamic>> maps = await db
-        .query(TABLE_HOME_BUDGET_OVERVIEW, orderBy: "year desc, month desc");
+        .query(TABLE_HOME_BUDGET_OVERVIEW, orderBy: 'year desc, month desc');
     return List.generate(maps.length, (i) {
       return mapModelToPOJO(maps[i]);
     });
@@ -98,12 +98,12 @@ class DBUtils {
   }
 
   static Future<List<HomeBudgetOverview>> checkIfWeHaveMonthExists(
-      month, year) async {
+      int month, int year) async {
     final Database db = await database();
     final List<Map<String, dynamic>> maps = await db.query(
         TABLE_HOME_BUDGET_OVERVIEW,
-        where: "month = ? and year = ?",
-        whereArgs: [month, year]);
+        where: 'month = ? and year = ?',
+        whereArgs: <int>[month, year]);
     return List.generate(maps.length, (i) {
       return mapModelToPOJO(maps[i]);
     });
@@ -113,8 +113,8 @@ class DBUtils {
     final Database db = await database();
     await db.delete(
       TABLE_HOME_BUDGET_OVERVIEW,
-      where: "id = ?",
-      whereArgs: [id],
+      where: 'id = ?',
+      whereArgs: <String>[id],
     );
   }
 
@@ -122,8 +122,8 @@ class DBUtils {
     final Database db = await database();
     await db.delete(
       TABLE_HOME_BUDGET_MONTHLY_DETAILS,
-      where: "id = ?",
-      whereArgs: [id],
+      where: 'id = ?',
+      whereArgs: <String>[id],
     );
   }
 }

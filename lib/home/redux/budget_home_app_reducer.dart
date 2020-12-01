@@ -1,8 +1,8 @@
-import 'package:home_budget_app/home/BudgetDetails.dart';
-import 'package:home_budget_app/home/HomeBudgetMetrics.dart';
-import 'package:home_budget_app/home/model/HomeBudgetOverview.dart';
-import 'package:home_budget_app/home/redux/BudgetAppState.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
+import 'package:home_budget_app/home/redux/budget_app_state.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
+import 'package:home_budget_app/home/ui/utilities.dart';
 
 BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
   if (null == action) {
@@ -17,9 +17,7 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
       return updateRecord(currentState, action);
     case MonthRecords:
       List<HomeBudgetOverview> monthRecords = currentState.monthRecords;
-      if (null == monthRecords) {
-        monthRecords = [];
-      }
+      monthRecords ??= [];
       monthRecords.addAll(action.list);
       return currentState.clone(monthRecords: monthRecords);
 
@@ -29,7 +27,7 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
     case FetchMonthlyRecords:
       return currentState.clone(
           listOfMonthRecords: action.list,
-          budgetMetrics: _updateTotalAmountsRef(action.list));
+          budgetMetrics: updateTotalAmountsRef(action.list));
 
     case SelectedMonth:
       return currentState.clone(selectedMonthRecord: action.selectedRecord);
@@ -54,7 +52,7 @@ BudgetAppState updateRecord(BudgetAppState currentState, EditRecord action) {
   final List<BudgetDetails> listOfMonthRecords =
       currentState.listOfMonthRecords;
   final BudgetDetails recordToBeUpdated = listOfMonthRecords
-      .firstWhere((element) => element.id == action.record.id);
+      .firstWhere((BudgetDetails element) => element.id == action.record.id);
   if (null != recordToBeUpdated) {
     recordToBeUpdated.type = action.record.type;
     recordToBeUpdated.amount = action.record.amount;
@@ -62,7 +60,7 @@ BudgetAppState updateRecord(BudgetAppState currentState, EditRecord action) {
 
     return currentState.clone(
         listOfMonthRecords: listOfMonthRecords,
-        budgetMetrics: _updateTotalAmountsRef(listOfMonthRecords));
+        budgetMetrics: updateTotalAmountsRef(listOfMonthRecords));
   }
   return currentState;
 }
@@ -72,39 +70,23 @@ BudgetAppState deleteRecordFromState(
   final List<BudgetDetails> listOfMonthRecords =
       currentState.listOfMonthRecords;
   final BudgetDetails recordToBeDeleted = listOfMonthRecords
-      .firstWhere((element) => element.id == action.record.id);
+      .firstWhere((BudgetDetails element) => element.id == action.record.id);
   if (null != recordToBeDeleted) {
     listOfMonthRecords.remove(recordToBeDeleted);
     return currentState.clone(
         listOfMonthRecords: listOfMonthRecords,
-        budgetMetrics: _updateTotalAmountsRef(listOfMonthRecords));
+        budgetMetrics: updateTotalAmountsRef(listOfMonthRecords));
   }
   return currentState;
 }
 
 BudgetAppState addRecordToState(BudgetAppState currentState, action) {
-  List<BudgetDetails> listOfMonthRecords = [];
+  final List<BudgetDetails> listOfMonthRecords = [];
   if (currentState.listOfMonthRecords != null) {
     listOfMonthRecords.addAll(currentState.listOfMonthRecords);
   }
   listOfMonthRecords.add(action.record);
   return currentState.clone(
       listOfMonthRecords: listOfMonthRecords,
-      budgetMetrics: _updateTotalAmountsRef(listOfMonthRecords));
-}
-
-HomeBudgetMetrics _updateTotalAmountsRef(List<BudgetDetails> list) {
-  int totalIncome = 0;
-  int totalSpent = 0;
-
-  list.forEach((element) {
-    if (element.type == "Credit") {
-      totalIncome += element.amount;
-    } else {
-      totalSpent += element.amount;
-    }
-  });
-
-  return HomeBudgetMetrics(
-      0, totalSpent, (totalIncome - totalSpent), totalIncome);
+      budgetMetrics: updateTotalAmountsRef(listOfMonthRecords));
 }

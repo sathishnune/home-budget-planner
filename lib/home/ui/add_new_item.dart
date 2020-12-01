@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/BudgetDetails.dart';
-import 'package:home_budget_app/home/redux/BudgetAppState.dart';
-import 'package:home_budget_app/home/redux/ThunkActions.dart';
+import 'package:home_budget_app/home/redux/budget_app_state.dart';
+import 'package:home_budget_app/home/redux/thunk_actions.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:redux/src/store.dart';
 import 'package:uuid/uuid.dart';
 
-Uuid uuid = new Uuid();
+Uuid uuid = Uuid();
 
 class AddRecord extends StatelessWidget {
   @override
@@ -16,7 +17,7 @@ class AddRecord extends StatelessWidget {
       children: [
         Scaffold(
           appBar: AppBar(
-            title: Text("Add record"),
+            title: const Text('Add record'),
             shadowColor: Colors.lightBlueAccent,
             //actions: [],
           ),
@@ -35,20 +36,20 @@ class AddRecordForm extends StatefulWidget {
 }
 
 class AddRecordFormState extends State<AddRecordForm> {
-  final _formKey = GlobalKey<FormState>();
-  final titleTextController = TextEditingController();
-  final amountTextController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _titleTextController = TextEditingController();
+  final TextEditingController _amountTextController = TextEditingController();
   bool _validTitleText = true;
   bool _validAmount = true;
 
-  String transactionType = "Credit";
+  String _transactionType = 'Credit';
 
   @override
   void dispose() {
     // Clean up the controller when the widget is removed from the
     // widget tree.
-    titleTextController.dispose();
-    amountTextController.dispose();
+    _titleTextController.dispose();
+    _amountTextController.dispose();
     super.dispose();
   }
 
@@ -64,7 +65,7 @@ class AddRecordFormState extends State<AddRecordForm> {
             TextFormField(
               autofocus: true,
               maxLength: 50,
-              controller: titleTextController,
+              controller: _titleTextController,
               decoration: InputDecoration(
                 icon: const Icon(Icons.description),
                 hintText: 'Enter Title',
@@ -78,9 +79,9 @@ class AddRecordFormState extends State<AddRecordForm> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly
               ],
-              controller: amountTextController,
+              controller: _amountTextController,
               decoration: InputDecoration(
-                  icon: Icon(
+                  icon: const Icon(
                     MdiIcons.currencyInr,
                   ),
                   hintText: 'Enter Amount',
@@ -89,33 +90,33 @@ class AddRecordFormState extends State<AddRecordForm> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: new Row(
+              child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    new Radio(
-                      value: "Credit",
-                      groupValue: transactionType,
-                      onChanged: (value) => {
+                    Radio(
+                      value: 'Credit',
+                      groupValue: _transactionType,
+                      onChanged: (String value) => {
                         setState(() {
-                          transactionType = value;
+                          _transactionType = value;
                         })
                       },
                     ),
-                    new Text(
+                    const Text(
                       'Credit',
-                      style: new TextStyle(fontSize: 18.0),
+                      style: TextStyle(fontSize: 18.0),
                     ),
-                    new Radio(
-                        value: "Debit",
-                        groupValue: transactionType,
-                        onChanged: (value) => {
+                    Radio(
+                        value: 'Debit',
+                        groupValue: _transactionType,
+                        onChanged: (String value) => {
                               setState(() {
-                                transactionType = value;
+                                _transactionType = value;
                               })
                             }),
-                    new Text(
+                    const Text(
                       'Debit',
-                      style: new TextStyle(
+                      style: TextStyle(
                         fontSize: 18.0,
                       ),
                     )
@@ -128,21 +129,21 @@ class AddRecordFormState extends State<AddRecordForm> {
                     color: Colors.lightBlue,
                     onPressed: () {
                       setState(() {
-                        titleTextController.text.trim().isEmpty
+                        _titleTextController.text.trim().isEmpty
                             ? _validTitleText = false
                             : _validTitleText = true;
 
-                        amountTextController.text.trim().isEmpty
+                        _amountTextController.text.trim().isEmpty
                             ? _validAmount = false
                             : _validAmount = true;
 
                         if (_validTitleText && _validAmount) {
-                          _readTheValues();
+                          _createNewRecord();
                         }
                       });
                     },
-                    child: Text(
-                      "ADD",
+                    child: const Text(
+                      'ADD',
                       style: TextStyle(
                           //  color: Colors.black12,
                           fontWeight: FontWeight.bold,
@@ -156,15 +157,16 @@ class AddRecordFormState extends State<AddRecordForm> {
     );
   }
 
-  void _readTheValues() {
-    var state = StoreProvider.of<BudgetAppState>(context);
-    final BudgetDetails details = BudgetDetails();
-    details.amount = int.parse(amountTextController.text);
-    details.title = titleTextController.text.trim();
-    details.type = transactionType;
-    details.id = uuid.v4();
-    state.dispatch(addNewRecordWithThunk(details));
+  void _createNewRecord() {
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
+    final BudgetDetails _details = BudgetDetails(
+        amount: int.parse(_amountTextController.text),
+        title: _titleTextController.text.trim(),
+        type: _transactionType,
+        id: uuid.v4());
 
+    _state.dispatch(addNewRecordWithThunk(_details));
     Navigator.pop(context);
   }
 }

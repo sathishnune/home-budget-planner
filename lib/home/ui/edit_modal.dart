@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/BudgetDetails.dart';
-import 'package:home_budget_app/home/redux/BudgetAppState.dart';
-import 'package:home_budget_app/home/redux/ThunkActions.dart';
+import 'package:home_budget_app/home/redux/budget_app_state.dart';
+import 'package:home_budget_app/home/redux/thunk_actions.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:redux/src/store.dart';
 
 class EditFullScreenDialog extends StatelessWidget {
-  final BudgetDetails budgetDetails;
+  const EditFullScreenDialog({this.budgetDetails});
 
-  EditFullScreenDialog({this.budgetDetails});
+  final BudgetDetails budgetDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class EditFullScreenDialog extends StatelessWidget {
       children: [
         Scaffold(
             appBar: AppBar(
-              title: Text("Edit the record"),
+              title: const Text('Edit the record'),
               elevation: 7,
               // backgroundColor: Colors.transparent,
               shadowColor: Colors.lightBlueAccent,
@@ -28,38 +29,38 @@ class EditFullScreenDialog extends StatelessWidget {
 }
 
 class EditForm extends StatefulWidget {
-  final BudgetDetails editRecord;
+  const EditForm({this.editRecord});
 
-  EditForm({this.editRecord});
+  final BudgetDetails editRecord;
 
   @override
   _EditFormState createState() => _EditFormState();
 }
 
 class _EditFormState extends State<EditForm> {
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController titleTextEditController = TextEditingController();
-  TextEditingController amountTextEditController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController _titleTextEditController = TextEditingController();
+  TextEditingController _amountTextEditController = TextEditingController();
   bool _validTitleText = true;
   bool _validAmount = true;
-  String transactionType2 = "Credit";
+  String _transactionType = 'Credit';
 
   @override
   void initState() {
     super.initState();
-    titleTextEditController =
+    _titleTextEditController =
         TextEditingController(text: widget.editRecord.title);
-    amountTextEditController =
+    _amountTextEditController =
         TextEditingController(text: widget.editRecord.amount.toString());
-    transactionType2 = widget.editRecord.type;
+    _transactionType = widget.editRecord.type;
   }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is removed from the
     // widget tree.
-    titleTextEditController.dispose();
-    amountTextEditController.dispose();
+    _titleTextEditController.dispose();
+    _amountTextEditController.dispose();
     super.dispose();
   }
 
@@ -73,7 +74,7 @@ class _EditFormState extends State<EditForm> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   TextFormField(
-                    controller: titleTextEditController,
+                    controller: _titleTextEditController,
                     decoration: InputDecoration(
                         icon: const Icon(Icons.description),
                         hintText: 'Enter Title',
@@ -83,9 +84,9 @@ class _EditFormState extends State<EditForm> {
                   ),
                   TextFormField(
                     keyboardType: TextInputType.number,
-                    controller: amountTextEditController,
+                    controller: _amountTextEditController,
                     decoration: InputDecoration(
-                        icon: Icon(
+                        icon: const Icon(
                           MdiIcons.currencyInr,
                         ),
                         hintText: 'Enter Amount',
@@ -95,33 +96,33 @@ class _EditFormState extends State<EditForm> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
-                    child: new Row(
+                    child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          new Radio(
-                            value: "Credit",
-                            groupValue: transactionType2,
-                            onChanged: (value) => {
+                          Radio(
+                            value: 'Credit',
+                            groupValue: _transactionType,
+                            onChanged: (String value) => {
                               setState(() {
-                                transactionType2 = value;
+                                _transactionType = value;
                               })
                             },
                           ),
-                          new Text(
+                          const Text(
                             'Credit',
-                            style: new TextStyle(fontSize: 18.0),
+                            style: TextStyle(fontSize: 18.0),
                           ),
-                          new Radio(
-                              value: "Debit",
-                              groupValue: transactionType2,
-                              onChanged: (value) => {
+                          Radio(
+                              value: 'Debit',
+                              groupValue: _transactionType,
+                              onChanged: (String value) => {
                                     setState(() {
-                                      transactionType2 = value;
+                                      _transactionType = value;
                                     })
                                   }),
-                          new Text(
+                          const Text(
                             'Debit',
-                            style: new TextStyle(
+                            style: TextStyle(
                               fontSize: 18.0,
                             ),
                           )
@@ -134,21 +135,21 @@ class _EditFormState extends State<EditForm> {
                           color: Colors.lightBlue,
                           onPressed: () {
                             setState(() {
-                              titleTextEditController.text.trim().isEmpty
+                              _titleTextEditController.text.trim().isEmpty
                                   ? _validTitleText = false
                                   : _validTitleText = true;
 
-                              amountTextEditController.text.trim().isEmpty
+                              _amountTextEditController.text.trim().isEmpty
                                   ? _validAmount = false
                                   : _validAmount = true;
 
                               if (_validTitleText && _validAmount) {
-                                _readTheValues();
+                                _updateRecord();
                               }
                             });
                           },
-                          child: Text(
-                            "SAVE",
+                          child: const Text(
+                            'SAVE',
                             style: TextStyle(
                                 //  color: Colors.black12,
                                 fontWeight: FontWeight.bold,
@@ -159,13 +160,14 @@ class _EditFormState extends State<EditForm> {
                 ])));
   }
 
-  void _readTheValues() {
-    var state = StoreProvider.of<BudgetAppState>(context);
+  void _updateRecord() {
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
     final BudgetDetails details = widget.editRecord;
-    details.amount = int.parse(amountTextEditController.text);
-    details.title = titleTextEditController.text.trim();
-    details.type = transactionType2;
-    state.dispatch(editRecordWithThunk(details));
+    details.amount = int.parse(_amountTextEditController.text);
+    details.title = _titleTextEditController.text.trim();
+    details.type = _transactionType;
+    _state.dispatch(editRecordWithThunk(details));
     Navigator.pop(context);
   }
 }

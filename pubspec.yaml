@@ -43,6 +43,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.8.1
+  analyzer: ^0.41.1
 
 flutter_icons:
   android: true
