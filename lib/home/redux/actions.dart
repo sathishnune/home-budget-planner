@@ -31,6 +31,12 @@ class DeleteRecord {
   final BudgetDetails record;
 }
 
+class DeleteMonthlyBudget {
+  DeleteMonthlyBudget({this.selectedRecord});
+
+  final HomeBudgetOverview selectedRecord;
+}
+
 class ShowLoadingIndicator {
   ShowLoadingIndicator({this.showIndicator});
 

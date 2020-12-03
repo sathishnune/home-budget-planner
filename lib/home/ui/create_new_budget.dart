@@ -76,7 +76,7 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
                         showMonthPicker(
                           context: context,
                           firstDate: DateTime(DateTime.now().year - 1),
-                          lastDate: DateTime(DateTime.now().year + 1),
+                          lastDate: DateTime(DateTime.now().year + 4),
                           initialDate: _selectedDate,
                         ).then((DateTime date) {
                           if (date != null) {

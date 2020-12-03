@@ -36,6 +36,10 @@ class BudgetAppState {
         isCreateNewBudgetValid:
             isCreateNewBudgetValid ?? this.isCreateNewBudgetValid,
         listOfMonthRecords: listOfMonthRecords ?? this.listOfMonthRecords,
-        selectedMonthRecord: selectedMonthRecord ?? this.selectedMonthRecord);
+        selectedMonthRecord: selectedMonthRecord == null
+            ? this.selectedMonthRecord
+            : selectedMonthRecord.markAsDelete
+                ? null
+                : selectedMonthRecord);
   }
 }

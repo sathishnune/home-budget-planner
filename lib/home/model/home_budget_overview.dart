@@ -5,6 +5,7 @@ class HomeBudgetOverview {
   int month;
   int year;
   String displayName;
+  bool markAsDelete = false;
 
   Map<String, dynamic> toMap() {
     return {
@@ -17,6 +18,6 @@ class HomeBudgetOverview {
 
   @override
   String toString() {
-    return 'HomeBudgetOverview{id: $id, month: $month, year: $year, displayName: $displayName}';
+    return 'HomeBudgetOverview{id: $id, month: $month, year: $year, displayName: $displayName, markAsDelete: $markAsDelete}';
   }
 }

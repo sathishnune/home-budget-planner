@@ -91,7 +91,9 @@ ThunkAction<BudgetAppState> addNewMonthlyBudget(
 
         // Add if record not there..
         DBUtils.insertHomeBudgetOverview(budgetOverview);
-        store.dispatch(InsertHomeBudgetOverview(budgetOverview));
+        if (DateTime.now().year == selectedDate.year) {
+          store.dispatch(InsertHomeBudgetOverview(budgetOverview));
+        }
 
         Navigator.pop(buildContext);
       } else {
@@ -117,7 +119,15 @@ ThunkAction<BudgetAppState> editRecordWithThunk(BudgetDetails record) {
 /// Delete the record
 ThunkAction<BudgetAppState> deleteRecordWithThunk(BudgetDetails record) {
   return (Store<BudgetAppState> store) async {
-    DBUtils.deleteHomeBudgetMonthlyDetails(record.id);
+    await DBUtils.deleteHomeBudgetMonthlyDetails(record.id);
     store.dispatch(DeleteRecord(record: record));
+  };
+}
+
+ThunkAction<BudgetAppState> deleteMonthlyBudget(
+    HomeBudgetOverview selectedRecord) {
+  return (Store<BudgetAppState> store) async {
+    await DBUtils.deleteHomeBudgetOverview(selectedRecord.id);
+    store.dispatch(DeleteMonthlyBudget(selectedRecord: selectedRecord));
   };
 }

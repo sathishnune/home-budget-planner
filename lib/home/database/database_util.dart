@@ -116,6 +116,7 @@ class DBUtils {
       where: 'id = ?',
       whereArgs: <String>[id],
     );
+    await deleteHomeBudgetMonthlyDetailsByRef(id);
   }
 
   static Future<void> deleteHomeBudgetMonthlyDetails(String id) async {
@@ -123,6 +124,15 @@ class DBUtils {
     await db.delete(
       TABLE_HOME_BUDGET_MONTHLY_DETAILS,
       where: 'id = ?',
+      whereArgs: <String>[id],
+    );
+  }
+
+  static Future<void> deleteHomeBudgetMonthlyDetailsByRef(String id) async {
+    final Database db = await database();
+    await db.delete(
+      TABLE_HOME_BUDGET_MONTHLY_DETAILS,
+      where: 'month_ref = ?',
       whereArgs: <String>[id],
     );
   }
