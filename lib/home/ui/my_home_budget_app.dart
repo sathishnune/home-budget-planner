@@ -1,13 +1,16 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/add_new_item.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
+import 'package:home_budget_app/home/ui/create_new_budget.dart';
 import 'package:home_budget_app/home/ui/edit_modal.dart';
 import 'package:home_budget_app/home/ui/home_budget_drawer.dart';
 import 'package:home_budget_app/home/ui/popup_menu.dart';
+import 'package:home_budget_app/home/ui/status_switch.dart';
 import 'package:home_budget_app/home/ui/summary_cards.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:redux/redux.dart';
@@ -43,7 +46,7 @@ class HomeWidget extends StatelessWidget {
             TabItem<dynamic>(icon: Icon(Icons.home), title: 'Home'),
             TabItem<dynamic>(icon: Icon(Icons.more_horiz), title: 'More')
           ],
-          onTap: (int i) => {print("click index= $i")},
+          onTap: (int i) => {print('click index= $i')},
         ),
         appBar: AppBar(
           title: const Text('My Home Budget Planner'),
@@ -74,9 +77,9 @@ class HomeWidget extends StatelessWidget {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('No month budget selected!!'),
+                        title: const Text('No month budget created!!'),
                         content: const Text(
-                            'Please choose the monthly budget to add the record'),
+                            'Please create monthly budget to add the record'),
                         actions: [_okButton],
                       );
                     });
@@ -87,25 +90,6 @@ class HomeWidget extends StatelessWidget {
             child: MyHomeBudgetDrawer(),
           ),
         ));
-  }
-
-  Widget _createFloatingAddButton(BuildContext context) {
-    final Store<BudgetAppState> _state =
-        StoreProvider.of<BudgetAppState>(context);
-    if (_state.state.selectedMonthRecord != null) {
-      return FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (BuildContext context) => AddRecord(),
-                    fullscreenDialog: true,
-                  ),
-                ),
-              });
-    }
-    return null;
   }
 }
 
@@ -126,10 +110,20 @@ class MyHomeBudgetAppBody extends StatelessWidget {
       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: <Widget>[
           Text(
-            "Oops. You didn't select the monthly record.",
+            "Oops. You haven't created a monthly budget yet.",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: RaisedButton(
+              child: const Text('CREATE BUDGET'),
+              color: Colors.blue,
+              onPressed: () {
+                createNewBudget(context);
+              },
+            ),
           )
         ],
       ),
@@ -143,7 +137,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
       converter: (Store<BudgetAppState> storeDetails) => storeDetails.state,
       builder: (BuildContext context, BudgetAppState storeDetails) {
         return Column(
-          children: [
+          children: <Widget>[
             if (storeDetails.selectedMonthRecord == null)
               _noBudgetSelected(context),
             if (storeDetails.selectedMonthRecord != null)
@@ -157,16 +151,16 @@ class MyHomeBudgetAppBody extends StatelessWidget {
               Container(),
             if (storeDetails.selectedMonthRecord != null)
               Expanded(
-                child: (null == storeDetails.listOfMonthRecords ||
-                        storeDetails.listOfMonthRecords.isEmpty)
+                child: (null == storeDetails.selectedMonthRecord.listOfMonthRecords ||
+                        storeDetails.selectedMonthRecord.listOfMonthRecords.isEmpty)
                     ? _noDetailsMonthlyBudget()
                     : ListView.builder(
-                        itemCount: storeDetails.listOfMonthRecords.length,
+                        itemCount: storeDetails.selectedMonthRecord.listOfMonthRecords.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: _budgetCardItemBuilder(
-                                storeDetails.listOfMonthRecords[index],
+                                storeDetails.selectedMonthRecord.listOfMonthRecords[index],
                                 context),
                           );
                         },
@@ -178,8 +172,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
     );
   }
 
-  static final String _rupeeSymbol =
-      String.fromCharCodes(new Runes(' \u{20B9}'));
+  static final String _rupeeSymbol = String.fromCharCodes(Runes(' \u{20B9}'));
 
   Widget _budgetCardItemBuilder(
       BudgetDetails budgetDetails, BuildContext context) {
@@ -190,15 +183,15 @@ class MyHomeBudgetAppBody extends StatelessWidget {
         child: ClipPath(
           child: Container(
             child: Column(
-              children: [
+              children: <Widget>[
                 ListTile(
                   isThreeLine: false,
                   title: Text(budgetDetails.title),
                   trailing: IconButton(
                     icon: const Icon(Icons.edit_sharp),
-                    onPressed: () => {
+                    onPressed: () => <void>{
                       if (budgetDetails != null)
-                        {
+                        <void>{
                           Navigator.push(
                               context,
                               MaterialPageRoute<void>(
@@ -214,12 +207,14 @@ class MyHomeBudgetAppBody extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 0.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.only(left: 15, bottom: 5),
                         child: Text(
                             'Amount: $_rupeeSymbol${budgetDetails.amount}'),
                       ),
+                      const Spacer(),
+                      StatusSwitch(budgetDetails: budgetDetails),
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: IconButton(
@@ -227,7 +222,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
                               Icons.delete,
                               color: Colors.black45,
                             ),
-                            onPressed: () => {
+                            onPressed: () => <void>{
                                   _deleteBudgetListItem(context, budgetDetails)
                                 }),
                       ),
@@ -274,7 +269,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
             title: const Text('Confirm Delete?'),
             content:
                 Text("Would you like to delete the '${details.title}' record?"),
-            actions: [
+            actions: <Widget>[
               cancelButton,
               continueButton,
             ],

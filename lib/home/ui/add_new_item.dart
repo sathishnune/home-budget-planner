@@ -93,7 +93,7 @@ class AddRecordFormState extends State<AddRecordForm> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Radio(
+                    Radio<String>(
                       value: 'Credit',
                       groupValue: _transactionType,
                       onChanged: (String value) => {
@@ -106,7 +106,7 @@ class AddRecordFormState extends State<AddRecordForm> {
                       'Credit',
                       style: TextStyle(fontSize: 18.0),
                     ),
-                    Radio(
+                    Radio<String>(
                         value: 'Debit',
                         groupValue: _transactionType,
                         onChanged: (String value) => {
@@ -164,6 +164,7 @@ class AddRecordFormState extends State<AddRecordForm> {
         amount: int.parse(_amountTextController.text),
         title: _titleTextController.text.trim(),
         type: _transactionType,
+        isCompleted: false,
         id: uuid.v4());
 
     _state.dispatch(addNewRecordWithThunk(_details));

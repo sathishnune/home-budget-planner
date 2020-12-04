@@ -60,3 +60,14 @@ class InsertHomeBudgetOverview {
 
   final HomeBudgetOverview budgetOverview;
 }
+
+class UpdateStatus extends SuperClass {
+  UpdateStatus({this.isCompleted, this.id});
+
+  final bool isCompleted;
+  final String id;
+}
+
+class SuperClass {
+
+}

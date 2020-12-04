@@ -8,7 +8,19 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:redux/src/store.dart';
 import 'package:uuid/uuid.dart';
 
-Uuid uuid = new Uuid();
+Uuid uuid = Uuid();
+
+Widget createNewBudget(BuildContext context) {
+  final Store<BudgetAppState> _state =
+      StoreProvider.of<BudgetAppState>(context);
+  _state.dispatch(ValidCreateNewBudget(true));
+  showDialog<SimpleDialog>(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+            title: const Text('Create New Month Budget Plan'),
+            children: <Widget>[CreateNewMonthlyBudget()],
+          ));
+}
 
 class CreateNewMonthlyBudget extends StatelessWidget {
   @override

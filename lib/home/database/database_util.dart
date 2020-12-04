@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:home_budget_app/home/model/home_budget_monthly_details.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:path/path.dart';
@@ -18,7 +19,7 @@ class DBUtils {
 
   static const String SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS =
       'CREATE TABLE HOME_BUDGET_MONTHLY_DETAILS(id TEXT PRIMARY KEY, '
-      'title TEXT, amount INTEGER, trans_type TEXT, '
+      'title TEXT, amount INTEGER, trans_type TEXT,status integer, '
       'month_ref TEXT, FOREIGN KEY (month_ref) REFERENCES '
       'HOME_BUDGET_OVERVIEW (id))';
 
@@ -61,6 +62,8 @@ class DBUtils {
         where: 'id = ?', whereArgs: <String>[monthlyDetails.id]);
   }
 
+  static T cast<T>(dynamic x) => x is T ? x : null;
+
   static Future<List<HomeBudgetMonthlyDetails>> monthlyDetails(
       String monthRefId) async {
     final Database db = await database();
@@ -70,11 +73,12 @@ class DBUtils {
         whereArgs: <String>[monthRefId]);
     return List.generate(maps.length, (int i) {
       return HomeBudgetMonthlyDetails(
-        id: maps[i]['id'],
-        title: maps[i]['title'],
-        amount: maps[i]['amount'],
-        transType: maps[i]['trans_type'],
-        monthRef: maps[i]['month_ref'],
+        id: cast<String>(maps[i]['id']),
+        title: cast<String>(maps[i]['title']),
+        amount: cast<int>(maps[i]['amount']),
+        transType: cast<String>(maps[i]['trans_type']),
+        monthRef: cast<String>(maps[i]['month_ref']),
+        status: cast<int>(maps[i]['status']),
       );
     });
   }
@@ -83,17 +87,17 @@ class DBUtils {
     final Database db = await database();
     final List<Map<String, dynamic>> maps = await db
         .query(TABLE_HOME_BUDGET_OVERVIEW, orderBy: 'year desc, month desc');
-    return List.generate(maps.length, (i) {
+    return List.generate(maps.length, (int i) {
       return mapModelToPOJO(maps[i]);
     });
   }
 
   static HomeBudgetOverview mapModelToPOJO(Map<String, dynamic> maps) {
     return HomeBudgetOverview(
-      id: maps['id'],
-      displayName: maps['display_name'],
-      month: maps['month'],
-      year: maps['year'],
+      id: cast<String>(maps['id']),
+      displayName: cast<String>(maps['display_name']),
+      month: cast<int>(maps['month']),
+      year: cast<int>(maps['year']),
     );
   }
 
@@ -135,5 +139,15 @@ class DBUtils {
       where: 'month_ref = ?',
       whereArgs: <String>[id],
     );
+  }
+
+  static Future<void> updateRecordStatus(String id, bool status) async {
+    final Database db = await database();
+    final Map<String, dynamic> row = <String, dynamic>{
+      'status': status ? 1 : 0
+    };
+
+    await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS, row,
+        whereArgs: <String>[id], where: 'id = ?');
   }
 }

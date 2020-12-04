@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/create_new_budget.dart';
@@ -44,23 +43,16 @@ class _PopupMenuItemsState extends State<PopupMenuItems> {
           );
 
           if (MyHomePopUpMenuItem.CREATE == result) {
-            _state.dispatch(ValidCreateNewBudget(true));
-            showDialog<SimpleDialog>(
-                context: context,
-                builder: (BuildContext context) => SimpleDialog(
-                      title: const Text('Create New Month Budget Plan'),
-                      children: [CreateNewMonthlyBudget()],
-                    ));
+            createNewBudget(context);
           } else if (MyHomePopUpMenuItem.DELETE == result) {
             if (_state.state.selectedMonthRecord == null) {
               showDialog<AlertDialog>(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: const Text('No month budget selected!!'),
-                      content: const Text(
-                          'Please choose the monthly budget to delete the record'),
-                      actions: [_okButton],
+                      title: const Text('No month budget created!!'),
+                      content: const Text('There are no records to delete.'),
+                      actions: <Widget>[_okButton],
                     );
                   });
             } else {
@@ -72,7 +64,7 @@ class _PopupMenuItemsState extends State<PopupMenuItems> {
                       content: Text(
                           "You are deleting '${_state.state.selectedMonthRecord.displayName}'. "
                           'Please note: Deleting budget will delete all records under monthly budget.'),
-                      actions: [_cancelButton, _continueButton],
+                      actions: <Widget>[_cancelButton, _continueButton],
                     );
                   });
             }

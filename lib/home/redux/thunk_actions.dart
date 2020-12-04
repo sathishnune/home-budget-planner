@@ -29,7 +29,8 @@ ThunkAction<BudgetAppState> fetchMonthRecords(String id) {
               title: e.title,
               amount: e.amount,
               status: null,
-              type: e.transType))
+              type: e.transType,
+              isCompleted: e.status == 1))
           .toList();
       store.dispatch(ShowLoadingIndicator(showIndicator: false));
       store.dispatch(FetchMonthlyRecords(list: newList));
@@ -129,5 +130,12 @@ ThunkAction<BudgetAppState> deleteMonthlyBudget(
   return (Store<BudgetAppState> store) async {
     await DBUtils.deleteHomeBudgetOverview(selectedRecord.id);
     store.dispatch(DeleteMonthlyBudget(selectedRecord: selectedRecord));
+  };
+}
+
+ThunkAction<BudgetAppState> updateRecordStatus(String id, bool status) {
+  return (Store<BudgetAppState> store) async {
+    await DBUtils.updateRecordStatus(id, status);
+    store.dispatch(UpdateStatus(isCompleted: status, id: id));
   };
 }

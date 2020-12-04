@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/budget_home_app_reducer.dart';
@@ -10,7 +11,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 void main() {
   final BudgetAppState _initialState = BudgetAppState(
-      monthRecords: [],
+      monthRecords: <HomeBudgetOverview>[],
       budgetMetrics: updateTotalAmountsRef([]),
       isLoading: false,
       isCreateNewBudgetValid: true);

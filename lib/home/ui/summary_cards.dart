@@ -17,7 +17,7 @@ class SummaryCards extends StatefulWidget {
 class _SummaryCardsState extends State<SummaryCards> {
   Widget _getTitleOfSummary() {
     return Row(
-      children: [
+      children: <Widget>[
         Container(
           width: MediaQuery.of(context).size.width * 0.9,
           child: Padding(
@@ -37,11 +37,11 @@ class _SummaryCardsState extends State<SummaryCards> {
     return Container(
       color: Colors.black12,
       child: Column(
-        children: [
+        children: <Widget>[
           _getTitleOfSummary(),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+            children: <Widget>[
               _getSummaryCard(context, Icons.payments_outlined, Colors.green,
                   'Income', widget.budgetMetrics.totalIncome),
               _getSummaryCard(
@@ -54,7 +54,7 @@ class _SummaryCardsState extends State<SummaryCards> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+            children: <Widget>[
               _getSummaryCard(context, Icons.account_balance_wallet,
                   Colors.blue, 'Balance', widget.budgetMetrics.remainingAmount)
             ],
@@ -81,32 +81,34 @@ class _SummaryCardsState extends State<SummaryCards> {
                     colors: [Colors.blueGrey, Colors.white70])),
             width: (MediaQuery.of(context).size.width / 2) - 4,
             height: 50,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Icon(
-                  iconData,
-                  size: 40,
-                  color: color,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: RichText(
-                  text: TextSpan(
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.bold),
-                      children: [
-                        TextSpan(
-                            text: '$transType: ',
-                            style: const TextStyle(color: Colors.black)),
-                        TextSpan(
-                            text: '$_rupeeSymbol $amount',
-                            style: TextStyle(color: color))
-                      ]),
-                ),
-              )
-            ]),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Icon(
+                      iconData,
+                      size: 40,
+                      color: color,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: RichText(
+                      text: TextSpan(
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: '$transType: ',
+                                style: const TextStyle(color: Colors.black)),
+                            TextSpan(
+                                text: '$_rupeeSymbol $amount',
+                                style: TextStyle(color: color))
+                          ]),
+                    ),
+                  )
+                ]),
           ),
         ),
       ),
