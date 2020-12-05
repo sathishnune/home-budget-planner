@@ -152,6 +152,7 @@ BudgetAppState deleteMonthlyBudget(
 
 BudgetAppState addRecordToState(BudgetAppState currentState, dynamic action) {
   final List<BudgetDetails> listOfMonthRecords = <BudgetDetails>[];
+  // TODO(Sathishnune): Need fix..
   if (currentState.selectedMonthRecord != null &&
       currentState.selectedMonthRecord.listOfMonthRecords != null) {
     listOfMonthRecords

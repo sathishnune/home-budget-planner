@@ -23,6 +23,7 @@ class _StatusSwitchState extends State<StatusSwitch> {
       child: Row(children: [
         const Text('Completed: '),
         Switch(
+          activeColor: Theme.of(context).primaryColor,
           value: widget.budgetDetails.isCompleted,
           onChanged: (bool value) {
             setState(() {

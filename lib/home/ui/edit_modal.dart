@@ -75,6 +75,7 @@ class _EditFormState extends State<EditForm> {
                 children: <Widget>[
                   TextFormField(
                     controller: _titleTextEditController,
+                    maxLength: 50,
                     decoration: InputDecoration(
                         icon: const Icon(Icons.description),
                         hintText: 'Enter Title',
@@ -84,6 +85,7 @@ class _EditFormState extends State<EditForm> {
                   ),
                   TextFormField(
                     keyboardType: TextInputType.number,
+                    maxLength: 6,
                     controller: _amountTextEditController,
                     decoration: InputDecoration(
                         icon: const Icon(
@@ -99,7 +101,8 @@ class _EditFormState extends State<EditForm> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Radio(
+                          Radio<String>(
+                            activeColor: Theme.of(context).primaryColor,
                             value: 'Credit',
                             groupValue: _transactionType,
                             onChanged: (String value) => {
@@ -112,8 +115,9 @@ class _EditFormState extends State<EditForm> {
                             'Credit',
                             style: TextStyle(fontSize: 18.0),
                           ),
-                          Radio(
+                          Radio<String>(
                               value: 'Debit',
+                              activeColor: Theme.of(context).primaryColor,
                               groupValue: _transactionType,
                               onChanged: (String value) => {
                                     setState(() {
@@ -132,7 +136,7 @@ class _EditFormState extends State<EditForm> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: RaisedButton(
-                          color: Colors.lightBlue,
+                          color: Theme.of(context).primaryColor,
                           onPressed: () {
                             setState(() {
                               _titleTextEditController.text.trim().isEmpty
@@ -148,13 +152,7 @@ class _EditFormState extends State<EditForm> {
                               }
                             });
                           },
-                          child: const Text(
-                            'SAVE',
-                            style: TextStyle(
-                                //  color: Colors.black12,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          )),
+                          child: const Text('SAVE')),
                     ),
                   )
                 ])));

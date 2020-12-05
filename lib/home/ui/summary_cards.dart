@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/ui/home_budget_metrics.dart';
+import 'package:home_budget_app/home/ui/utilities.dart';
 
 class SummaryCards extends StatefulWidget {
   const SummaryCards(
@@ -93,7 +94,7 @@ class _SummaryCardsState extends State<SummaryCards> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 16),
+                    padding: const EdgeInsets.only(left: 8),
                     child: RichText(
                       text: TextSpan(
                           style: const TextStyle(
@@ -103,7 +104,7 @@ class _SummaryCardsState extends State<SummaryCards> {
                                 text: '$transType: ',
                                 style: const TextStyle(color: Colors.black)),
                             TextSpan(
-                                text: '$_rupeeSymbol $amount',
+                                text: '$_rupeeSymbol${formatNumber(amount)}',
                                 style: TextStyle(color: color))
                           ]),
                     ),

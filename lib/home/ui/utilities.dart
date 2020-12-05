@@ -5,6 +5,7 @@ import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/create_new_budget.dart';
 import 'package:home_budget_app/home/ui/home_budget_metrics.dart';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
 class HorizontalLine extends StatelessWidget {
@@ -31,4 +32,10 @@ HomeBudgetMetrics updateTotalAmountsRef(List<BudgetDetails> list) {
       totalSpentAmount: totalSpent,
       remainingAmount: totalIncome - totalSpent,
       totalIncome: totalIncome);
+}
+
+String formatNumber(int number) {
+  final NumberFormat numberFormat =
+      NumberFormat.currency(locale: 'en_IN', decimalDigits: 0, name: '');
+  return numberFormat.format(number);
 }

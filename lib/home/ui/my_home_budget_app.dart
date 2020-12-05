@@ -1,10 +1,10 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/add_new_item.dart';
+import 'package:home_budget_app/home/ui/analytics.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/create_new_budget.dart';
 import 'package:home_budget_app/home/ui/edit_modal.dart';
@@ -15,45 +15,99 @@ import 'package:home_budget_app/home/ui/summary_cards.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:redux/redux.dart';
 
-class MyHomeBudgetApp extends StatelessWidget {
+class MyHomeBudgetApp extends StatefulWidget {
   const MyHomeBudgetApp({this.store});
 
   final Store<BudgetAppState> store;
 
   @override
+  _MyHomeBudgetAppState createState() => _MyHomeBudgetAppState();
+}
+
+class _MyHomeBudgetAppState extends State<MyHomeBudgetApp> {
+  ThemeData _themeData(BuildContext context) {
+    ThemeData baseTheme = ThemeData.light();
+
+    final Brightness systemBrightness =
+        MediaQueryData.fromWindow(WidgetsBinding.instance.window)
+            .platformBrightness;
+    if (Brightness.dark == systemBrightness) {
+      baseTheme = ThemeData.dark();
+    }
+
+    final Color primaryColor = Colors.green;
+    final Color secondaryColor = Colors.lightBlueAccent;
+
+    return baseTheme.copyWith(
+        brightness: Brightness.light,
+        primaryColor: primaryColor,
+        secondaryHeaderColor: secondaryColor,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+            foregroundColor: Colors.black, backgroundColor: secondaryColor));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StoreProvider<BudgetAppState>(
-        store: store,
+        store: widget.store,
         child: MaterialApp(
-          debugShowCheckedModeBanner: false,
+          theme: _themeData(context),
+          darkTheme: ThemeData.dark(),
+          themeMode: ThemeMode.system,
           title: 'My Home Budget Planner',
           home: HomeWidget(),
         ));
   }
 }
 
-class HomeWidget extends StatelessWidget {
+class HomeWidget extends StatefulWidget {
+  @override
+  _HomeWidgetState createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
+  final List<Widget> appBodyList = <Widget>[MyHomeBudgetAppBody(), Analytics()];
+  int _selectedIndex = 0;
+
+  Widget _bottomNavigationBar() {
+    return ConvexAppBar(
+      style: TabStyle.reactCircle,
+      backgroundColor: Theme.of(context).primaryColor,
+      color: Theme.of(context).selectedRowColor,
+      activeColor: Theme.of(context).backgroundColor,
+      initialActiveIndex: _selectedIndex,
+      height: 60,
+      items: <TabItem>[
+        const TabItem<Icon>(
+          icon: Icon(Icons.home),
+          title: 'Details',
+        ),
+        const TabItem<Icon>(icon: Icon(Icons.settings), title: 'Settings')
+      ],
+      onTap: (int i) {
+        print('click index= $i');
+        setState(() {
+          _selectedIndex = i;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-        bottomNavigationBar: ConvexAppBar(
-          style: TabStyle.reactCircle,
-          initialActiveIndex: 1,
-          height: 60,
-          items: [
-            const TabItem<Icon>(icon: Icon(Icons.history), title: 'History'),
-            TabItem<dynamic>(icon: Icon(Icons.home), title: 'Home'),
-            TabItem<dynamic>(icon: Icon(Icons.more_horiz), title: 'More')
-          ],
-          onTap: (int i) => {print('click index= $i')},
-        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        bottomNavigationBar: _bottomNavigationBar(),
         appBar: AppBar(
           title: const Text('My Home Budget Planner'),
-          actions: [PopupMenuItems()],
+          actions: <Widget>[PopupMenuItems()],
         ),
-        body: MyHomeBudgetAppBody(),
+        body: appBodyList[_selectedIndex],
         floatingActionButton: FloatingActionButton(
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
             child: const Icon(Icons.add),
             onPressed: () {
               final Store<BudgetAppState> _state =
@@ -69,6 +123,7 @@ class HomeWidget extends StatelessWidget {
               } else {
                 final Widget _okButton = FlatButton(
                   child: const Text('Okay'),
+                  textColor: Theme.of(context).primaryColor,
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -80,7 +135,7 @@ class HomeWidget extends StatelessWidget {
                         title: const Text('No month budget created!!'),
                         content: const Text(
                             'Please create monthly budget to add the record'),
-                        actions: [_okButton],
+                        actions: <Widget>[_okButton],
                       );
                     });
               }
@@ -111,7 +166,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
+          const Text(
             "Oops. You haven't created a monthly budget yet.",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
@@ -119,7 +174,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: RaisedButton(
               child: const Text('CREATE BUDGET'),
-              color: Colors.blue,
+              color: Theme.of(context).primaryColor,
               onPressed: () {
                 createNewBudget(context);
               },
@@ -151,16 +206,21 @@ class MyHomeBudgetAppBody extends StatelessWidget {
               Container(),
             if (storeDetails.selectedMonthRecord != null)
               Expanded(
-                child: (null == storeDetails.selectedMonthRecord.listOfMonthRecords ||
-                        storeDetails.selectedMonthRecord.listOfMonthRecords.isEmpty)
+                child: (null ==
+                            storeDetails
+                                .selectedMonthRecord.listOfMonthRecords ||
+                        storeDetails
+                            .selectedMonthRecord.listOfMonthRecords.isEmpty)
                     ? _noDetailsMonthlyBudget()
                     : ListView.builder(
-                        itemCount: storeDetails.selectedMonthRecord.listOfMonthRecords.length,
+                        itemCount: storeDetails
+                            .selectedMonthRecord.listOfMonthRecords.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: _budgetCardItemBuilder(
-                                storeDetails.selectedMonthRecord.listOfMonthRecords[index],
+                                storeDetails.selectedMonthRecord
+                                    .listOfMonthRecords[index],
                                 context),
                           );
                         },
@@ -188,7 +248,8 @@ class MyHomeBudgetAppBody extends StatelessWidget {
                   isThreeLine: false,
                   title: Text(budgetDetails.title),
                   trailing: IconButton(
-                    icon: const Icon(Icons.edit_sharp),
+                    icon: Icon(Icons.edit,
+                        color: Theme.of(context).iconTheme.color),
                     onPressed: () => <void>{
                       if (budgetDetails != null)
                         <void>{
@@ -211,17 +272,15 @@ class MyHomeBudgetAppBody extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(left: 15, bottom: 5),
                         child: Text(
-                            'Amount: $_rupeeSymbol${budgetDetails.amount}'),
+                            'Amount: $_rupeeSymbol${formatNumber(budgetDetails.amount)}'),
                       ),
                       const Spacer(),
                       StatusSwitch(budgetDetails: budgetDetails),
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
                         child: IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.black45,
-                            ),
+                            icon: Icon(Icons.delete_rounded,
+                                color: Theme.of(context).iconTheme.color),
                             onPressed: () => <void>{
                                   _deleteBudgetListItem(context, budgetDetails)
                                 }),
@@ -248,12 +307,14 @@ class MyHomeBudgetAppBody extends StatelessWidget {
   void _deleteBudgetListItem(BuildContext context, BudgetDetails details) {
     final Widget cancelButton = FlatButton(
       child: const Text('Cancel'),
+      textColor: Theme.of(context).primaryColor,
       onPressed: () {
         Navigator.pop(context);
       },
     );
     final Widget continueButton = FlatButton(
       child: const Text('Delete'),
+      textColor: Theme.of(context).primaryColor,
       onPressed: () {
         final Store<BudgetAppState> state =
             StoreProvider.of<BudgetAppState>(context);

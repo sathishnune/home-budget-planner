@@ -16,11 +16,7 @@ class AddRecord extends StatelessWidget {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(
-            title: const Text('Add record'),
-            shadowColor: Colors.lightBlueAccent,
-            //actions: [],
-          ),
+          appBar: AppBar(title: const Text('Add record')),
           body: AddRecordForm(),
         )
       ],
@@ -94,6 +90,7 @@ class AddRecordFormState extends State<AddRecordForm> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Radio<String>(
+                      activeColor: Theme.of(context).primaryColor,
                       value: 'Credit',
                       groupValue: _transactionType,
                       onChanged: (String value) => {
@@ -107,6 +104,7 @@ class AddRecordFormState extends State<AddRecordForm> {
                       style: TextStyle(fontSize: 18.0),
                     ),
                     Radio<String>(
+                        activeColor: Theme.of(context).primaryColor,
                         value: 'Debit',
                         groupValue: _transactionType,
                         onChanged: (String value) => {
@@ -126,7 +124,7 @@ class AddRecordFormState extends State<AddRecordForm> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: RaisedButton(
-                    color: Colors.lightBlue,
+                    color: Theme.of(context).primaryColor,
                     onPressed: () {
                       setState(() {
                         _titleTextController.text.trim().isEmpty
@@ -142,13 +140,7 @@ class AddRecordFormState extends State<AddRecordForm> {
                         }
                       });
                     },
-                    child: const Text(
-                      'ADD',
-                      style: TextStyle(
-                          //  color: Colors.black12,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
-                    )),
+                    child: const Text('ADD')),
               ),
             )
           ],

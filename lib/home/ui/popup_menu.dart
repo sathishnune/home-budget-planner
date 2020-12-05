@@ -21,6 +21,7 @@ class _PopupMenuItemsState extends State<PopupMenuItems> {
         setState(() {
           final Widget _cancelButton = FlatButton(
             child: const Text('Cancel'),
+            textColor: Theme.of(context).primaryColor,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -28,6 +29,7 @@ class _PopupMenuItemsState extends State<PopupMenuItems> {
 
           final Widget _okButton = FlatButton(
             child: const Text('Okay'),
+            textColor: Theme.of(context).primaryColor,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -35,6 +37,7 @@ class _PopupMenuItemsState extends State<PopupMenuItems> {
 
           final Widget _continueButton = FlatButton(
             child: const Text('Delete'),
+            textColor: Theme.of(context).primaryColor,
             onPressed: () {
               _state.dispatch(
                   deleteMonthlyBudget(_state.state.selectedMonthRecord));

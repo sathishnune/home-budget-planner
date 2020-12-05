@@ -15,7 +15,9 @@ class MyHomeBudgetDrawer extends StatelessWidget {
         builder: (BuildContext context, BudgetAppState storeDetails) {
           return Column(
             children: [
-              const UserAccountsDrawerHeader(
+              UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).secondaryHeaderColor),
                   accountName: Text('Sathish Nune'),
                   accountEmail: Text('Sathish8103@gmail.com')),
               Expanded(

@@ -105,7 +105,7 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: RaisedButton(
-                          color: Colors.lightBlue,
+                          color: Theme.of(context).primaryColor,
                           onPressed: () {
                             setState(() {
                               _dateController.text.isEmpty
