@@ -3,6 +3,10 @@
 Description: 
 
 
+## Techincal Stack
+Flutter + Dart + Redux + SQLite (Local Database)
+
+
 ## Upcoming features
 1. Add settings to change the theme of the application - Start with few colors
 2. Add recurring items to Settings, So next monthly budget will take from Settings for repeated values.
