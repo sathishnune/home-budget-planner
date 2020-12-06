@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:home_budget_app/home/database/database_util.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/home_budget_metrics.dart';
+import 'package:home_budget_app/home/ui/theme.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 
 BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
@@ -11,6 +13,9 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
     return currentState;
   }
   switch (DBUtils.cast<Type>(action.runtimeType)) {
+    case ApplicationTheme:
+      return changeApplicationThemeDate(currentState, action);
+
     case AddNewRecord:
       return addRecordToState(currentState, action);
     case DeleteRecord:
@@ -148,6 +153,13 @@ BudgetAppState deleteMonthlyBudget(
         budgetMetrics: HomeBudgetMetrics().getDefaultValues());
   }
   return currentState;
+}
+
+BudgetAppState changeApplicationThemeDate(
+    BudgetAppState currentState, dynamic action) {
+  final ThemeData appTheme =
+      DBUtils.cast<ThemeData>(action.applicationTheme) ?? ThemeData.light();
+  return currentState.clone(applicationTheme: appTheme);
 }
 
 BudgetAppState addRecordToState(BudgetAppState currentState, dynamic action) {

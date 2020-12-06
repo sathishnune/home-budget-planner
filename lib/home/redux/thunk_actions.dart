@@ -5,6 +5,7 @@ import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
+import 'package:home_budget_app/home/ui/theme.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:uuid/uuid.dart';
@@ -34,6 +35,20 @@ ThunkAction<BudgetAppState> fetchMonthRecords(String id) {
           .toList();
       store.dispatch(ShowLoadingIndicator(showIndicator: false));
       store.dispatch(FetchMonthlyRecords(list: newList));
+    });
+  };
+}
+
+ThunkAction<BudgetAppState> getApplicationTheme() {
+  return (Store<BudgetAppState> store) async {
+    await DBUtils.getColorCode().then((List<Map<String, dynamic>> value) {
+      //value.first.
+      debugPrint(value.toString());
+      final int colorCode = DBUtils.cast<int>(value.first.entries.first.value);
+
+      final ThemeData themeData =
+          applicationTheme(colorCode != null ? Color(colorCode) : Colors.green);
+      store.dispatch(ApplicationTheme(applicationTheme: themeData));
     });
   };
 }
@@ -71,7 +86,11 @@ ThunkAction<BudgetAppState> addNewRecordWithThunk(BudgetDetails record) {
         amount: record.amount,
         monthRef: store.state.selectedMonthRecord.id,
         transType: record.type);
-    DBUtils.insertHomeBudgetMonthlyDetails(monthlyDetails);
+    final int recordOrder = (store.state.selectedMonthRecord != null &&
+            store.state.selectedMonthRecord.listOfMonthRecords != null)
+        ? store.state.selectedMonthRecord.listOfMonthRecords.length
+        : 0;
+    DBUtils.insertHomeBudgetMonthlyDetails(monthlyDetails, recordOrder);
     store.dispatch(AddNewRecord(record: record));
   };
 }

@@ -11,21 +11,25 @@ class BudgetAppState {
       this.budgetMetrics,
       this.isLoading,
       this.isCreateNewBudgetValid,
-      this.selectedMonthRecord});
+      this.selectedMonthRecord,
+      this.applicationTheme});
 
   final List<HomeBudgetOverview> monthRecords;
   final HomeBudgetMetrics budgetMetrics;
   final bool isLoading;
   final bool isCreateNewBudgetValid;
   final HomeBudgetOverview selectedMonthRecord;
+  final ThemeData applicationTheme;
 
   BudgetAppState clone(
       {final List<HomeBudgetOverview> monthRecords,
       final HomeBudgetMetrics budgetMetrics,
       final bool isLoading,
       final bool isCreateNewBudgetValid,
-      final HomeBudgetOverview selectedMonthRecord}) {
+      final HomeBudgetOverview selectedMonthRecord,
+      final ThemeData applicationTheme}) {
     return BudgetAppState(
+        applicationTheme: applicationTheme ?? this.applicationTheme,
         monthRecords: monthRecords ?? this.monthRecords,
         budgetMetrics: budgetMetrics ?? this.budgetMetrics,
         isLoading: isLoading ?? this.isLoading,

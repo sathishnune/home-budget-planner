@@ -1,17 +1,20 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:home_budget_app/home/database/database_util.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/add_new_item.dart';
-import 'package:home_budget_app/home/ui/analytics.dart';
+import 'package:home_budget_app/home/ui/settings.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/create_new_budget.dart';
 import 'package:home_budget_app/home/ui/edit_modal.dart';
 import 'package:home_budget_app/home/ui/home_budget_drawer.dart';
 import 'package:home_budget_app/home/ui/popup_menu.dart';
+import 'package:home_budget_app/home/ui/reorder_list.dart';
 import 'package:home_budget_app/home/ui/status_switch.dart';
 import 'package:home_budget_app/home/ui/summary_cards.dart';
+import 'package:home_budget_app/home/ui/theme.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:redux/redux.dart';
 
@@ -25,35 +28,12 @@ class MyHomeBudgetApp extends StatefulWidget {
 }
 
 class _MyHomeBudgetAppState extends State<MyHomeBudgetApp> {
-  ThemeData _themeData(BuildContext context) {
-    ThemeData baseTheme = ThemeData.light();
-
-    final Brightness systemBrightness =
-        MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-            .platformBrightness;
-    if (Brightness.dark == systemBrightness) {
-      baseTheme = ThemeData.dark();
-    }
-
-    final Color primaryColor = Colors.green;
-    final Color secondaryColor = Colors.lightBlueAccent;
-
-    return baseTheme.copyWith(
-        brightness: Brightness.light,
-        primaryColor: primaryColor,
-        secondaryHeaderColor: secondaryColor,
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-            foregroundColor: Colors.black, backgroundColor: secondaryColor));
-  }
-
   @override
   Widget build(BuildContext context) {
     return StoreProvider<BudgetAppState>(
         store: widget.store,
         child: MaterialApp(
-          theme: _themeData(context),
-          darkTheme: ThemeData.dark(),
-          themeMode: ThemeMode.system,
+          theme: widget.store.state.applicationTheme,
           title: 'My Home Budget Planner',
           home: HomeWidget(),
         ));
@@ -66,7 +46,7 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  final List<Widget> appBodyList = <Widget>[MyHomeBudgetAppBody(), Analytics()];
+  final List<Widget> appBodyList = <Widget>[MyHomeBudgetAppBody(), Settings()];
   int _selectedIndex = 0;
 
   Widget _bottomNavigationBar() {
@@ -212,19 +192,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
                         storeDetails
                             .selectedMonthRecord.listOfMonthRecords.isEmpty)
                     ? _noDetailsMonthlyBudget()
-                    : ListView.builder(
-                        itemCount: storeDetails
-                            .selectedMonthRecord.listOfMonthRecords.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: _budgetCardItemBuilder(
-                                storeDetails.selectedMonthRecord
-                                    .listOfMonthRecords[index],
-                                context),
-                          );
-                        },
-                      ),
+                    : buildReOrderedListView(context, storeDetails),
               )
           ],
         );
@@ -232,16 +200,35 @@ class MyHomeBudgetAppBody extends StatelessWidget {
     );
   }
 
-  static final String _rupeeSymbol = String.fromCharCodes(Runes(' \u{20B9}'));
+  ReorderableListView buildReOrderedListView(
+      BuildContext context, BudgetAppState storeDetails) {
+    return ReorderableListView(
+      onReorder: (int oldIndex, int newIndex) => reorderMonthlyRecords(
+          context,
+          storeDetails.selectedMonthRecord.listOfMonthRecords,
+          oldIndex,
+          newIndex),
+      children: storeDetails.selectedMonthRecord.listOfMonthRecords
+          .map(
+            (BudgetDetails budgetDetails) =>
+                _budgetCardItemBuilder(budgetDetails, context),
+          )
+          .toList(),
+    );
+  }
+
+  final String _rupeeSymbol = String.fromCharCodes(Runes(' \u{20B9}'));
 
   Widget _budgetCardItemBuilder(
       BudgetDetails budgetDetails, BuildContext context) {
     return Card(
+        key: Key(budgetDetails.id),
         //clipBehavior: Clip.antiAlias,
         elevation: 2,
         //color: Colors.white70,
         child: ClipPath(
           child: Container(
+            height: 120,
             child: Column(
               children: <Widget>[
                 ListTile(

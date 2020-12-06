@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 
@@ -68,6 +69,10 @@ class UpdateStatus extends SuperClass {
   final String id;
 }
 
-class SuperClass {
+class SuperClass {}
 
+class ApplicationTheme {
+  ApplicationTheme({this.applicationTheme});
+
+  final ThemeData applicationTheme;
 }

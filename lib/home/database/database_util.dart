@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 class DBUtils {
   static const String DB_NAME = 'home_budget_database.db';
 
+  static const String TABLE_HOME_BUDGET_THEME = 'HOME_BUDGET_THEME';
   static const String TABLE_HOME_BUDGET_OVERVIEW = 'HOME_BUDGET_OVERVIEW';
   static const String TABLE_HOME_BUDGET_MONTHLY_DETAILS =
       'HOME_BUDGET_MONTHLY_DETAILS';
@@ -17,10 +18,13 @@ class DBUtils {
       'CREATE TABLE HOME_BUDGET_OVERVIEW(id TEXT PRIMARY KEY, month INTEGER, '
       'year INTEGER, display_name TEXT)';
 
+  static const String SQL_CREATE_HOME_DETAILS_THEME =
+      'CREATE TABLE HOME_BUDGET_THEME(colorCode INTEGER)';
+
   static const String SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS =
       'CREATE TABLE HOME_BUDGET_MONTHLY_DETAILS(id TEXT PRIMARY KEY, '
       'title TEXT, amount INTEGER, trans_type TEXT,status integer, '
-      'month_ref TEXT, FOREIGN KEY (month_ref) REFERENCES '
+      'record_order integer, month_ref TEXT, FOREIGN KEY (month_ref) REFERENCES '
       'HOME_BUDGET_OVERVIEW (id))';
 
   static Future<Database> database() async {
@@ -33,6 +37,7 @@ class DBUtils {
   static void _createTables(Database db) {
     db.execute(SQL_CREATE_HOME_DETAILS_OVERVIEW);
     db.execute(SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS);
+    db.execute(SQL_CREATE_HOME_DETAILS_THEME);
   }
 
   static Future<void> insertHomeBudgetOverview(
@@ -46,11 +51,11 @@ class DBUtils {
   }
 
   static Future<void> insertHomeBudgetMonthlyDetails(
-      HomeBudgetMonthlyDetails monthlyDetails) async {
+      HomeBudgetMonthlyDetails monthlyDetails, int currentLength) async {
     final Database db = await database();
     await db.insert(
       TABLE_HOME_BUDGET_MONTHLY_DETAILS,
-      monthlyDetails.toMap(),
+      monthlyDetails.toMap(currentLength),
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
   }
@@ -58,7 +63,8 @@ class DBUtils {
   static Future<void> updateHomeBudgetMonthlyDetails(
       HomeBudgetMonthlyDetails monthlyDetails) async {
     final Database db = await database();
-    await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS, monthlyDetails.toMap(),
+    await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS,
+        monthlyDetails.toMap(monthlyDetails.recordOrder),
         where: 'id = ?', whereArgs: <String>[monthlyDetails.id]);
   }
 
@@ -70,7 +76,8 @@ class DBUtils {
     final List<Map<String, dynamic>> maps = await db.query(
         TABLE_HOME_BUDGET_MONTHLY_DETAILS,
         where: 'month_ref = ?',
-        whereArgs: <String>[monthRefId]);
+        whereArgs: <String>[monthRefId],
+        orderBy: 'record_order ASC');
     return List.generate(maps.length, (int i) {
       return HomeBudgetMonthlyDetails(
         id: cast<String>(maps[i]['id']),
@@ -149,5 +156,38 @@ class DBUtils {
 
     await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS, row,
         whereArgs: <String>[id], where: 'id = ?');
+  }
+
+  static Future<void> updateRecordOrder(String id, int recordOrder) async {
+    final Database db = await database();
+    final Map<String, dynamic> row = <String, dynamic>{
+      'record_order': recordOrder
+    };
+
+    await db.update(TABLE_HOME_BUDGET_MONTHLY_DETAILS, row,
+        whereArgs: <String>[id], where: 'id = ?');
+  }
+
+  static Future<void> updateColorCodeForAppTheme(int colorCode) async {
+    final Database db = await database();
+    await db
+        .query(TABLE_HOME_BUDGET_THEME)
+        .then((List<Map<String, dynamic>> value) async {
+      final Map<String, dynamic> row = <String, dynamic>{
+        'colorCode': colorCode
+      };
+      debugPrint(value.toString());
+      if (value.isEmpty) {
+        await db.insert(TABLE_HOME_BUDGET_THEME, row);
+      } else {
+        await db.update(TABLE_HOME_BUDGET_THEME, row);
+      }
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> getColorCode() async {
+    final Database db = await database();
+    return await db.query(TABLE_HOME_BUDGET_THEME,
+        columns: ['colorCode'], limit: 1);
   }
 }
