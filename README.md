@@ -3,9 +3,11 @@
 Description: 
 
 
-## Techincal Stack
+## Technical Stack
 Flutter + Dart + Redux + SQLite (Local Database)
 
+## Screenshots
+![Month View](/images/Month_View.jpg) ![Add New Record](/images/Add_New_Record.jpg) ![Add New Record](/images/Edit_Record.jpg)
 
 ## Upcoming features
 1. Add settings to change the theme of the application - Start with few colors
