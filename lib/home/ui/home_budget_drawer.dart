@@ -1,53 +1,62 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/redux/budget_app_state.dart';
-import 'package:home_budget_app/home/redux/thunk_actions.dart';
-import 'package:redux/src/store.dart';
+import 'package:home_budget_app/home/ui/create_new_budget.dart';
+import 'package:home_budget_app/home/ui/manage_budgets.dart';
+import 'package:home_budget_app/home/ui/settings.dart';
 
-class MyHomeBudgetDrawer extends StatelessWidget {
+class MyHomeBudgetDrawer extends StatefulWidget {
+  @override
+  _MyHomeBudgetDrawerState createState() => _MyHomeBudgetDrawerState();
+}
+
+class _MyHomeBudgetDrawerState extends State<MyHomeBudgetDrawer> {
+  void _onSettingButtonPress(BuildContext context) {
+    Navigator.pop(context);
+    Navigator.push(context,
+        MaterialPageRoute<void>(builder: (BuildContext context) => Settings()));
+  }
+
+  void _manageMonthlyBudgets(BuildContext context) {
+    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+            builder: (BuildContext context) => ManageBudgetRecords()));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Store<BudgetAppState> state =
-        StoreProvider.of<BudgetAppState>(context);
-    return StoreConnector<BudgetAppState, BudgetAppState>(
-        distinct: true,
-        converter: (Store<BudgetAppState> storeDetails) => storeDetails.state,
-        builder: (BuildContext context, BudgetAppState storeDetails) {
-          return Column(
-            children: [
-              UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).secondaryHeaderColor),
-                  accountName: Text('Sathish Nune'),
-                  accountEmail: Text('Sathish8103@gmail.com')),
-              Expanded(
-                  child: ExpansionTile(
-                      title: const Text('Months - Budgets'),
-                      children: [
-                    ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Divider();
-                      },
-                      shrinkWrap: true,
-                      itemCount: null != storeDetails.monthRecords
-                          ? storeDetails.monthRecords.length
-                          : 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          tileColor: Colors.lightBlueAccent,
-                          title: Text(
-                              storeDetails.monthRecords[index].displayName),
-                          onTap: () {
-                            state.dispatch(refreshMonthSpecificData(
-                                storeDetails.monthRecords[index]));
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    ),
-                  ])),
-            ],
-          );
-        });
+    return Column(
+      children: <Widget>[
+        const UserAccountsDrawerHeader(
+            currentAccountPicture: CircleAvatar(
+              child: Text('SN'),
+            ),
+            accountName: Text('Sathish Nune'),
+            accountEmail: Text('Sathish8103@gmail.com')),
+        ListTile(
+          leading: const Icon(Icons.add_rounded),
+          title: const Text('Create new budget'),
+          onTap: () {
+            Navigator.pop(context);
+            createNewBudget(context);
+          },
+        ),
+        const Divider(thickness: 2),
+        ListTile(
+          leading: const Icon(Icons.settings),
+          title: const Text('Settings'),
+          onTap: () {
+            _onSettingButtonPress(context);
+          },
+        ),
+        const Divider(thickness: 2),
+        ListTile(
+          leading: const Icon(Icons.list),
+          title: const Text('Manage Budgets'),
+          onTap: () => _manageMonthlyBudgets(context),
+        ),
+        const Divider(thickness: 2),
+      ],
+    );
   }
 }

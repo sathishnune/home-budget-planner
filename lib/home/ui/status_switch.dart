@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
@@ -20,10 +19,9 @@ class _StatusSwitchState extends State<StatusSwitch> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(children: [
+      child: Row(children: <Widget>[
         const Text('Completed: '),
         Switch(
-          activeColor: Theme.of(context).primaryColor,
           value: widget.budgetDetails.isCompleted,
           onChanged: (bool value) {
             setState(() {

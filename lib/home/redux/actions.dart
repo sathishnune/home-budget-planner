@@ -70,9 +70,3 @@ class UpdateStatus extends SuperClass {
 }
 
 class SuperClass {}
-
-class ApplicationTheme {
-  ApplicationTheme({this.applicationTheme});
-
-  final ThemeData applicationTheme;
-}

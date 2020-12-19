@@ -1,20 +1,21 @@
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'dart:async';
+
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:home_budget_app/home/database/database_util.dart';
+import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/add_new_item.dart';
-import 'package:home_budget_app/home/ui/settings.dart';
+import 'package:home_budget_app/home/ui/app_bar_title.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/create_new_budget.dart';
 import 'package:home_budget_app/home/ui/edit_modal.dart';
 import 'package:home_budget_app/home/ui/home_budget_drawer.dart';
-import 'package:home_budget_app/home/ui/popup_menu.dart';
 import 'package:home_budget_app/home/ui/reorder_list.dart';
 import 'package:home_budget_app/home/ui/status_switch.dart';
 import 'package:home_budget_app/home/ui/summary_cards.dart';
-import 'package:home_budget_app/home/ui/theme.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:redux/redux.dart';
 
@@ -32,11 +33,19 @@ class _MyHomeBudgetAppState extends State<MyHomeBudgetApp> {
   Widget build(BuildContext context) {
     return StoreProvider<BudgetAppState>(
         store: widget.store,
-        child: MaterialApp(
-          theme: widget.store.state.applicationTheme,
-          title: 'My Home Budget Planner',
-          home: HomeWidget(),
-        ));
+        child: DynamicTheme(
+            defaultBrightness: Brightness.light,
+            data: (Brightness brightness) => ThemeData(
+                  primarySwatch: Colors.indigo,
+                  brightness: brightness,
+                ),
+            themedWidgetBuilder: (BuildContext context, ThemeData theme) {
+              return MaterialApp(
+                title: 'My Home Budget Planner',
+                theme: theme,
+                home: HomeWidget(),
+              );
+            }));
   }
 }
 
@@ -46,43 +55,123 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  final List<Widget> appBodyList = <Widget>[MyHomeBudgetAppBody(), Settings()];
-  int _selectedIndex = 0;
+  String monthSelected = 'NA';
 
-  Widget _bottomNavigationBar() {
-    return ConvexAppBar(
-      style: TabStyle.reactCircle,
-      backgroundColor: Theme.of(context).primaryColor,
-      color: Theme.of(context).selectedRowColor,
-      activeColor: Theme.of(context).backgroundColor,
-      initialActiveIndex: _selectedIndex,
-      height: 60,
-      items: <TabItem>[
-        const TabItem<Icon>(
-          icon: Icon(Icons.home),
-          title: 'Details',
-        ),
-        const TabItem<Icon>(icon: Icon(Icons.settings), title: 'Settings')
-      ],
-      onTap: (int i) {
-        print('click index= $i');
-        setState(() {
-          _selectedIndex = i;
-        });
-      },
-    );
+  String defaultMonthSelected() {
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
+    if (_state.state != null && _state.state.selectedMonthRecord != null) {
+      return _state.state.selectedMonthRecord.displayName;
+    }
+    return monthSelected;
+  }
+
+  int i = 0;
+
+  String onMonthArrowPressed(bool isLeft) {
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
+    final List<HomeBudgetOverview> months = _state.state.monthRecords;
+
+    if (isLeft) {
+      if (i != 0) {
+        --i;
+      }
+    } else {
+      if (i + 1 < months.length) {
+        ++i;
+      }
+    }
+
+    if (i >= 0 && i < months.length && months.elementAt(i) != null) {
+      return months.elementAt(i).displayName;
+    }
+    return monthSelected;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    Timer(const Duration(seconds: 1), () => <void>{_getColorCode(context)});
+  }
+
+  void _getColorCode(BuildContext context) {
+    DBUtils.getColorCode().then((List<Map<String, dynamic>> value) {
+      if (null != value &&
+          value.isNotEmpty &&
+          null != value.first &&
+          null != value.first.entries &&
+          null != value.first.entries.first &&
+          null != value.first.entries.first.value) {
+        final int colorCode =
+            DBUtils.cast<int>(value.first.entries.first.value);
+        DynamicTheme.of(context).setThemeData(
+            ThemeData(primaryColor: Color(colorCode ?? Colors.green.value)));
+      }
+    });
+  }
+
+  Widget buildTitleCard(BuildContext context) {
+    final Store<BudgetAppState> _state =
+        StoreProvider.of<BudgetAppState>(context);
+
+    if (_state.state.monthRecords.isEmpty) {
+      return Container(
+        child: const Text('Home Budget Planner'),
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          IconButton(
+              icon: const Icon(
+                Icons.arrow_left,
+                size: 35,
+              ),
+              onPressed: () {
+                final String monthName = onMonthArrowPressed(true);
+                if (null != monthName) {
+                  setState(() {
+                    monthSelected = monthName;
+                    _state.dispatch(
+                        refreshMonthSpecificData(_state.state.monthRecords[i]));
+                  });
+                }
+              }),
+          Text(monthSelected),
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_right,
+              size: 35,
+            ),
+            onPressed: () {
+              final String monthName = onMonthArrowPressed(false);
+              if (null != monthName) {
+                setState(() {
+                  monthSelected = monthName;
+                  if (null != _state.state.monthRecords &&
+                      _state.state.monthRecords.isNotEmpty &&
+                      _state.state.monthRecords.length > i) {
+                    _state.dispatch(
+                        refreshMonthSpecificData(_state.state.monthRecords[i]));
+                  }
+                });
+              }
+            },
+          ),
+        ],
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    monthSelected = defaultMonthSelected();
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        bottomNavigationBar: _bottomNavigationBar(),
-        appBar: AppBar(
-          title: const Text('My Home Budget Planner'),
-          actions: <Widget>[PopupMenuItems()],
-        ),
-        body: appBodyList[_selectedIndex],
+        appBar: AppBar(title: AppBarTitle()),
+        body: MyHomeBudgetAppBody(),
         floatingActionButton: FloatingActionButton(
             backgroundColor:
                 Theme.of(context).floatingActionButtonTheme.backgroundColor,

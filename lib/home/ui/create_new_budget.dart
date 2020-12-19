@@ -132,10 +132,12 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
   void _validateAndCreateNewBudget(
       DateTime selectedDate, String formattedDate) {
     if (null != selectedDate) {
-      final Store<BudgetAppState> _state =
-          StoreProvider.of<BudgetAppState>(context);
-      _state
-          .dispatch(addNewMonthlyBudget(selectedDate, formattedDate, context));
+      setState(() {
+        final Store<BudgetAppState> _state =
+            StoreProvider.of<BudgetAppState>(context);
+        _state.dispatch(
+            addNewMonthlyBudget(selectedDate, formattedDate, context));
+      });
     }
   }
 }
