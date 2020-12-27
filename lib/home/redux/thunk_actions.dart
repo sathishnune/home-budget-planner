@@ -80,9 +80,25 @@ ThunkAction<BudgetAppState> addNewRecordWithThunk(BudgetDetails record) {
   };
 }
 
+ThunkAction<BudgetAppState> addNewRecurringRecord(BudgetDetails record) {
+  return (Store<BudgetAppState> store) async {
+    final HomeBudgetMonthlyDetails monthlyDetails = HomeBudgetMonthlyDetails(
+        id: record.id,
+        title: record.title,
+        amount: record.amount,
+        transType: record.type);
+
+    DBUtils.insertHomeBudgetRecurringDetails(monthlyDetails);
+    store.dispatch(AddRecurringRecord(recurringRecord: record));
+  };
+}
+
 /// Adding new record...
 ThunkAction<BudgetAppState> addNewMonthlyBudget(
-    DateTime selectedDate, String formattedDate, BuildContext buildContext) {
+    DateTime selectedDate,
+    String formattedDate,
+    BuildContext buildContext,
+    bool copyRecurringRecords) {
   return (Store<BudgetAppState> store) async {
     // Check if we have any record...
     DBUtils.checkIfWeHaveMonthExists(selectedDate.month, selectedDate.year)
@@ -95,10 +111,34 @@ ThunkAction<BudgetAppState> addNewMonthlyBudget(
             id: uuid.v4());
 
         // Add if record not there..
-        DBUtils.insertHomeBudgetOverview(budgetOverview);
-        if (DateTime.now().year == selectedDate.year) {
-          store.dispatch(InsertHomeBudgetOverview(budgetOverview));
-        }
+        DBUtils.insertHomeBudgetOverview(budgetOverview).then((value) {
+          if (true == copyRecurringRecords) {
+            DBUtils.recurringRecords().then((List<BudgetDetails> value) {
+              int i = 0;
+              value.forEach((BudgetDetails element) {
+                final HomeBudgetMonthlyDetails details =
+                    HomeBudgetMonthlyDetails(
+                        id: uuid.v4(),
+                        status: 0,
+                        title: element.title,
+                        amount: element.amount,
+                        monthRef: budgetOverview.id,
+                        transType: element.type,
+                        recordOrder: i);
+                DBUtils.insertHomeBudgetMonthlyDetails(details, i);
+                i++;
+              });
+              budgetOverview.listOfMonthRecords = value;
+              if (DateTime.now().year == selectedDate.year) {
+                store.dispatch(InsertHomeBudgetOverview(budgetOverview));
+              }
+            });
+          } else {
+            if (DateTime.now().year == selectedDate.year) {
+              store.dispatch(InsertHomeBudgetOverview(budgetOverview));
+            }
+          }
+        });
 
         Navigator.pop(buildContext);
       } else {
@@ -108,7 +148,7 @@ ThunkAction<BudgetAppState> addNewMonthlyBudget(
   };
 }
 
-/// Adding new record...
+/// Edit new record...
 ThunkAction<BudgetAppState> editRecordWithThunk(BudgetDetails record) {
   return (Store<BudgetAppState> store) async {
     DBUtils.updateHomeBudgetMonthlyDetails(HomeBudgetMonthlyDetails(
@@ -121,11 +161,38 @@ ThunkAction<BudgetAppState> editRecordWithThunk(BudgetDetails record) {
   };
 }
 
+/// Edit new record...
+ThunkAction<BudgetAppState> editRecurringRecord(BudgetDetails record) {
+  return (Store<BudgetAppState> store) async {
+    DBUtils.updateHomeBudgetRecurringDetails(HomeBudgetMonthlyDetails(
+        id: record.id,
+        transType: record.type,
+        amount: record.amount,
+        title: record.title));
+    store.dispatch(EditRecurringRecord(recurringRecord: record));
+  };
+}
+
+ThunkAction<BudgetAppState> fetchRecurringRecords() {
+  return (Store<BudgetAppState> store) async {
+    DBUtils.recurringRecords().then((List<BudgetDetails> value) {
+      store.dispatch(ListOfRecurringRecords(listOfRecurringRecords: value));
+    });
+  };
+}
+
 /// Delete the record
 ThunkAction<BudgetAppState> deleteRecordWithThunk(BudgetDetails record) {
   return (Store<BudgetAppState> store) async {
     await DBUtils.deleteHomeBudgetMonthlyDetails(record.id);
     store.dispatch(DeleteRecord(record: record));
+  };
+}
+
+ThunkAction<BudgetAppState> deleteRecurringRecord(BudgetDetails record) {
+  return (Store<BudgetAppState> store) async {
+    await DBUtils.deleteRecurringRecord(record.id);
+    store.dispatch(DeleteRecurringRecord(recurringRecord: record));
   };
 }
 

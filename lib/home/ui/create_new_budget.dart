@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
@@ -42,6 +43,7 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
   final TextEditingController _dateController = TextEditingController();
   DateTime _selectedDateFromApp;
   bool _isDateValid = true;
+  bool _copyRecurringRecords = true;
 
   @override
   void dispose() {
@@ -101,6 +103,19 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
                           }
                         });
                       }),
+                  Row(
+                    children: [
+                      const Text('Copy Recurring records: '),
+                      Checkbox(
+                        value: _copyRecurringRecords,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _copyRecurringRecords = value;
+                          });
+                        },
+                      )
+                    ],
+                  ),
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16.0),
@@ -136,7 +151,7 @@ class _AddNewBudgetFormState extends State<AddNewBudgetForm> {
         final Store<BudgetAppState> _state =
             StoreProvider.of<BudgetAppState>(context);
         _state.dispatch(
-            addNewMonthlyBudget(selectedDate, formattedDate, context));
+            addNewMonthlyBudget(selectedDate, formattedDate, context, _copyRecurringRecords));
       });
     }
   }

@@ -69,4 +69,28 @@ class UpdateStatus extends SuperClass {
   final String id;
 }
 
+class AddRecurringRecord {
+  AddRecurringRecord({this.recurringRecord});
+
+  final BudgetDetails recurringRecord;
+}
+
+class EditRecurringRecord {
+  EditRecurringRecord({this.recurringRecord});
+
+  final BudgetDetails recurringRecord;
+}
+
+class ListOfRecurringRecords {
+  ListOfRecurringRecords({this.listOfRecurringRecords});
+
+  final List<BudgetDetails> listOfRecurringRecords;
+}
+
+class DeleteRecurringRecord {
+  DeleteRecurringRecord({this.recurringRecord});
+
+  final BudgetDetails recurringRecord;
+}
+
 class SuperClass {}

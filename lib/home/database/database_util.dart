@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:home_budget_app/home/model/home_budget_monthly_details.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
+import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,6 +13,7 @@ class DBUtils {
 
   static const String TABLE_HOME_BUDGET_THEME = 'HOME_BUDGET_THEME';
   static const String TABLE_HOME_BUDGET_OVERVIEW = 'HOME_BUDGET_OVERVIEW';
+  static const String TABLE_HOME_RECURRING_BUDGET = 'HOME_BUDGET_RECURRING';
   static const String TABLE_HOME_BUDGET_MONTHLY_DETAILS =
       'HOME_BUDGET_MONTHLY_DETAILS';
 
@@ -27,17 +30,24 @@ class DBUtils {
       'record_order integer, month_ref TEXT, FOREIGN KEY (month_ref) REFERENCES '
       'HOME_BUDGET_OVERVIEW (id))';
 
+  static const String SQL_CREATE_HOME_BUDGET_RECURRING_DETAILS =
+      'CREATE TABLE HOME_BUDGET_RECURRING(id TEXT PRIMARY KEY, '
+      'title TEXT, amount INTEGER, trans_type TEXT)';
+
   static Future<Database> database() async {
-    return openDatabase(
-        join(await getDatabasesPath(), 'home_budget_database.db'),
-        onCreate: (Database db, int version) => _createTables(db),
-        version: 1);
+    return openDatabase(join(await getDatabasesPath(), DB_NAME),
+        onCreate: (Database db, int version) => _createTables(db), version: 1);
+  }
+
+  static void getDataBaseFile1() {
+    getDatabasesPath().then((String value) => debugPrint('value: ' + value));
   }
 
   static void _createTables(Database db) {
     db.execute(SQL_CREATE_HOME_DETAILS_OVERVIEW);
     db.execute(SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS);
     db.execute(SQL_CREATE_HOME_DETAILS_THEME);
+    db.execute(SQL_CREATE_HOME_BUDGET_RECURRING_DETAILS);
   }
 
   static Future<void> insertHomeBudgetOverview(
@@ -60,6 +70,24 @@ class DBUtils {
     );
   }
 
+  static Future<void> insertHomeBudgetRecurringDetails(
+      HomeBudgetMonthlyDetails monthlyDetails) async {
+    final Database db = await database();
+    await db.insert(
+      TABLE_HOME_RECURRING_BUDGET,
+      monthlyDetails.toMapWithOutOrder(),
+      conflictAlgorithm: ConflictAlgorithm.fail,
+    );
+  }
+
+  static Future<void> updateHomeBudgetRecurringDetails(
+      HomeBudgetMonthlyDetails monthlyDetails) async {
+    final Database db = await database();
+    await db.update(
+        TABLE_HOME_RECURRING_BUDGET, monthlyDetails.toMapWithOutOrder(),
+        where: 'id = ?', whereArgs: <String>[monthlyDetails.id]);
+  }
+
   static Future<void> updateHomeBudgetMonthlyDetails(
       HomeBudgetMonthlyDetails monthlyDetails) async {
     final Database db = await database();
@@ -68,7 +96,18 @@ class DBUtils {
         where: 'id = ?', whereArgs: <String>[monthlyDetails.id]);
   }
 
-  static T cast<T>(dynamic x) => x is T ? x : null;
+  static Future<List<BudgetDetails>> recurringRecords() async {
+    final Database db = await database();
+    final List<Map<String, dynamic>> maps =
+        await db.query(TABLE_HOME_RECURRING_BUDGET);
+    return List.generate(maps.length, (int i) {
+      return BudgetDetails(
+          id: Utils.cast<String>(maps[i]['id']),
+          title: Utils.cast<String>(maps[i]['title']),
+          amount: Utils.cast<int>(maps[i]['amount']),
+          type: Utils.cast<String>(maps[i]['trans_type']));
+    });
+  }
 
   static Future<List<HomeBudgetMonthlyDetails>> monthlyDetails(
       String monthRefId) async {
@@ -80,12 +119,12 @@ class DBUtils {
         orderBy: 'record_order ASC');
     return List.generate(maps.length, (int i) {
       return HomeBudgetMonthlyDetails(
-        id: cast<String>(maps[i]['id']),
-        title: cast<String>(maps[i]['title']),
-        amount: cast<int>(maps[i]['amount']),
-        transType: cast<String>(maps[i]['trans_type']),
-        monthRef: cast<String>(maps[i]['month_ref']),
-        status: cast<int>(maps[i]['status']),
+        id: Utils.cast<String>(maps[i]['id']),
+        title: Utils.cast<String>(maps[i]['title']),
+        amount: Utils.cast<int>(maps[i]['amount']),
+        transType: Utils.cast<String>(maps[i]['trans_type']),
+        monthRef: Utils.cast<String>(maps[i]['month_ref']),
+        status: Utils.cast<int>(maps[i]['status']),
       );
     });
   }
@@ -101,10 +140,10 @@ class DBUtils {
 
   static HomeBudgetOverview mapModelToPOJO(Map<String, dynamic> maps) {
     return HomeBudgetOverview(
-      id: cast<String>(maps['id']),
-      displayName: cast<String>(maps['display_name']),
-      month: cast<int>(maps['month']),
-      year: cast<int>(maps['year']),
+      id: Utils.cast<String>(maps['id']),
+      displayName: Utils.cast<String>(maps['display_name']),
+      month: Utils.cast<int>(maps['month']),
+      year: Utils.cast<int>(maps['year']),
     );
   }
 
@@ -134,6 +173,15 @@ class DBUtils {
     final Database db = await database();
     await db.delete(
       TABLE_HOME_BUDGET_MONTHLY_DETAILS,
+      where: 'id = ?',
+      whereArgs: <String>[id],
+    );
+  }
+
+  static Future<void> deleteRecurringRecord(String id) async {
+    final Database db = await database();
+    await db.delete(
+      TABLE_HOME_RECURRING_BUDGET,
       where: 'id = ?',
       whereArgs: <String>[id],
     );

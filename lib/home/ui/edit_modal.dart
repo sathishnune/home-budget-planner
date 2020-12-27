@@ -7,9 +7,10 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:redux/src/store.dart';
 
 class EditFullScreenDialog extends StatelessWidget {
-  const EditFullScreenDialog({this.budgetDetails});
+  const EditFullScreenDialog({this.budgetDetails, this.isRecurringBudget});
 
   final BudgetDetails budgetDetails;
+  final bool isRecurringBudget;
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +23,20 @@ class EditFullScreenDialog extends StatelessWidget {
               // backgroundColor: Colors.transparent,
               shadowColor: Colors.lightBlueAccent,
             ),
-            body: EditForm(editRecord: budgetDetails))
+            body: EditForm(
+              editRecord: budgetDetails,
+              isRecurringBudget: isRecurringBudget,
+            ))
       ],
     );
   }
 }
 
 class EditForm extends StatefulWidget {
-  const EditForm({this.editRecord});
+  const EditForm({this.editRecord, this.isRecurringBudget});
 
   final BudgetDetails editRecord;
+  final bool isRecurringBudget;
 
   @override
   _EditFormState createState() => _EditFormState();
@@ -161,11 +166,17 @@ class _EditFormState extends State<EditForm> {
   void _updateRecord() {
     final Store<BudgetAppState> _state =
         StoreProvider.of<BudgetAppState>(context);
-    final BudgetDetails details = widget.editRecord;
-    details.amount = int.parse(_amountTextEditController.text);
-    details.title = _titleTextEditController.text.trim();
-    details.type = _transactionType;
-    _state.dispatch(editRecordWithThunk(details));
+    final BudgetDetails _details = widget.editRecord;
+    _details.amount = int.parse(_amountTextEditController.text);
+    _details.title = _titleTextEditController.text.trim();
+    _details.type = _transactionType;
+
+    if (widget.isRecurringBudget != null && widget.isRecurringBudget == true) {
+      _state.dispatch(editRecurringRecord(_details));
+    } else {
+      _state.dispatch(editRecordWithThunk(_details));
+    }
+
     Navigator.pop(context);
   }
 }

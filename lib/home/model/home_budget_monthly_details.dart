@@ -28,6 +28,15 @@ class HomeBudgetMonthlyDetails {
     };
   }
 
+  Map<String, dynamic> toMapWithOutOrder() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'amount': amount,
+      'trans_type': transType
+    };
+  }
+
   @override
   String toString() {
     return 'HomeBudgetMonthlyDetails{id: $id, title: $title, amount: $amount, '

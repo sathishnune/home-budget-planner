@@ -10,42 +10,42 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
   if (null == action) {
     return currentState;
   }
-  switch (DBUtils.cast<Type>(action.runtimeType)) {
+  switch (Utils.cast<Type>(action.runtimeType)) {
     case AddNewRecord:
       return addRecordToState(currentState, action);
     case DeleteRecord:
       return deleteRecordFromState(
-          currentState, DBUtils.cast<DeleteRecord>(action));
+          currentState, Utils.cast<DeleteRecord>(action));
     case EditRecord:
-      return updateRecord(currentState, DBUtils.cast<EditRecord>(action));
+      return updateRecord(currentState, Utils.cast<EditRecord>(action));
     case MonthRecords:
       List<HomeBudgetOverview> monthRecords = currentState.monthRecords;
       monthRecords ??= List<HomeBudgetOverview>.of(<HomeBudgetOverview>[]);
-      monthRecords.addAll(DBUtils.cast<List<HomeBudgetOverview>>(action.list));
+      monthRecords.addAll(Utils.cast<List<HomeBudgetOverview>>(action.list));
       return currentState.clone(monthRecords: monthRecords);
 
     case ShowLoadingIndicator:
       return currentState.clone(
-          isLoading: DBUtils.cast<bool>(action.showIndicator));
+          isLoading: Utils.cast<bool>(action.showIndicator));
 
     case FetchMonthlyRecords:
       final HomeBudgetOverview selectedMonthRecord =
           currentState.selectedMonthRecord;
       selectedMonthRecord.listOfMonthRecords =
-          DBUtils.cast<List<BudgetDetails>>(action.list);
+          Utils.cast<List<BudgetDetails>>(action.list);
       return currentState.clone(
           selectedMonthRecord: selectedMonthRecord,
           budgetMetrics: updateTotalAmountsRef(
-              DBUtils.cast<List<BudgetDetails>>(action.list)));
+              Utils.cast<List<BudgetDetails>>(action.list)));
 
     case SelectedMonth:
       return currentState.clone(
           selectedMonthRecord:
-              DBUtils.cast<HomeBudgetOverview>(action.selectedRecord));
+              Utils.cast<HomeBudgetOverview>(action.selectedRecord));
 
     case ValidCreateNewBudget:
       return currentState.clone(
-          isCreateNewBudgetValid: DBUtils.cast<bool>(action.isValid));
+          isCreateNewBudgetValid: Utils.cast<bool>(action.isValid));
 
     case InsertHomeBudgetOverview:
       List<HomeBudgetOverview> monthRecords = <HomeBudgetOverview>[];
@@ -54,24 +54,53 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
       } else {
         monthRecords = currentState.monthRecords;
       }
-      monthRecords.add(DBUtils.cast<HomeBudgetOverview>(action.budgetOverview));
+      final HomeBudgetOverview budgetOverview =
+          Utils.cast<HomeBudgetOverview>(action.budgetOverview);
+      monthRecords.add(budgetOverview);
 
       _sortMonthRecords(monthRecords);
 
       return currentState.clone(
           monthRecords: monthRecords,
-          selectedMonthRecord:
-              DBUtils.cast<HomeBudgetOverview>(action.budgetOverview),
-          budgetMetrics: updateTotalAmountsRef([]));
+          selectedMonthRecord: budgetOverview,
+          budgetMetrics:
+              updateTotalAmountsRef(budgetOverview.listOfMonthRecords ?? []));
 
     case DeleteMonthlyBudget:
       return deleteMonthlyBudget(currentState, action);
 
     case UpdateStatus:
-      return updateTheRecordStatus(
-          currentState,
-          DBUtils.cast<bool>(action.isCompleted),
-          DBUtils.cast<String>(action.id));
+      return updateTheRecordStatus(currentState,
+          Utils.cast<bool>(action.isCompleted), Utils.cast<String>(action.id));
+
+    case AddRecurringRecord:
+      List<BudgetDetails> currentRecords = currentState.recurringRecords;
+      if (null == currentRecords || currentRecords.isEmpty) {
+        currentRecords = [];
+      }
+      currentRecords.add(Utils.cast<BudgetDetails>(action.recurringRecord));
+      return currentState.clone(recurringRecords: currentRecords);
+
+    case DeleteRecurringRecord:
+      List<BudgetDetails> currentRecords = currentState.recurringRecords;
+      if (null == currentRecords || currentRecords.isEmpty) {
+        currentRecords = [];
+      }
+      if (currentRecords.isNotEmpty) {
+        currentRecords.removeWhere((BudgetDetails element) =>
+            element.id == Utils.cast<BudgetDetails>(action.recurringRecord).id);
+      }
+      return currentState.clone(recurringRecords: currentRecords);
+
+    case ListOfRecurringRecords:
+      final List<BudgetDetails> recurringRecords = [];
+      recurringRecords.addAll(
+          Utils.cast<List<BudgetDetails>>(action.listOfRecurringRecords));
+      return currentState.clone(recurringRecords: recurringRecords);
+
+    case EditRecurringRecord:
+      return updateRecurringRecord(
+          currentState, Utils.cast<BudgetDetails>(action.recurringRecord));
 
     default:
       return currentState;
@@ -111,6 +140,21 @@ BudgetAppState updateRecord(BudgetAppState currentState, EditRecord action) {
     return currentState.clone(
         selectedMonthRecord: currentState.selectedMonthRecord,
         budgetMetrics: updateTotalAmountsRef(listOfMonthRecords));
+  }
+  return currentState;
+}
+
+BudgetAppState updateRecurringRecord(
+    BudgetAppState currentState, BudgetDetails budgetDetails) {
+  final List<BudgetDetails> listOfRecurringRecords =
+      currentState.recurringRecords;
+  final BudgetDetails recordToBeUpdated = listOfRecurringRecords
+      .firstWhere((BudgetDetails element) => element.id == budgetDetails.id);
+  if (null != recordToBeUpdated) {
+    recordToBeUpdated.type = budgetDetails.type;
+    recordToBeUpdated.amount = budgetDetails.amount;
+    recordToBeUpdated.title = budgetDetails.title;
+    return currentState.clone(recurringRecords: listOfRecurringRecords);
   }
   return currentState;
 }
@@ -167,7 +211,7 @@ BudgetAppState addRecordToState(BudgetAppState currentState, dynamic action) {
     listOfMonthRecords
         .addAll(currentState.selectedMonthRecord.listOfMonthRecords);
   }
-  listOfMonthRecords.add(DBUtils.cast<BudgetDetails>(action.record));
+  listOfMonthRecords.add(Utils.cast<BudgetDetails>(action.record));
   currentState.selectedMonthRecord.listOfMonthRecords = listOfMonthRecords;
   return currentState.clone(
       selectedMonthRecord: currentState.selectedMonthRecord,

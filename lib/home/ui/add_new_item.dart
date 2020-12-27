@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
 import 'package:home_budget_app/home/redux/thunk_actions.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
@@ -11,13 +12,17 @@ import 'package:uuid/uuid.dart';
 Uuid uuid = Uuid();
 
 class AddRecord extends StatelessWidget {
+  const AddRecord({this.isRecurringBudget});
+
+  final bool isRecurringBudget;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Scaffold(
           appBar: AppBar(title: const Text('Add record')),
-          body: AddRecordForm(),
+          body: AddRecordForm(isRecurringBudget: isRecurringBudget),
         )
       ],
     );
@@ -25,6 +30,10 @@ class AddRecord extends StatelessWidget {
 }
 
 class AddRecordForm extends StatefulWidget {
+  const AddRecordForm({this.isRecurringBudget});
+
+  final bool isRecurringBudget;
+
   @override
   AddRecordFormState createState() {
     return AddRecordFormState();
@@ -159,7 +168,12 @@ class AddRecordFormState extends State<AddRecordForm> {
         isCompleted: false,
         id: uuid.v4());
 
-    _state.dispatch(addNewRecordWithThunk(_details));
+    if (widget.isRecurringBudget != null && widget.isRecurringBudget == true) {
+      _state.dispatch(addNewRecurringRecord(_details));
+    } else {
+      _state.dispatch(addNewRecordWithThunk(_details));
+    }
+
     Navigator.pop(context);
   }
 }

@@ -22,7 +22,7 @@ class _StatusSwitchState extends State<StatusSwitch> {
       child: Row(children: <Widget>[
         const Text('Completed: '),
         Switch(
-          value: widget.budgetDetails.isCompleted,
+          value: widget.budgetDetails.isCompleted ?? false,
           onChanged: (bool value) {
             setState(() {
               final Store<BudgetAppState> _state =

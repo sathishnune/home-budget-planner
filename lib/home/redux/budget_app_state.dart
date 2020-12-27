@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
+import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/home_budget_metrics.dart';
 
 /// State has to be immutable for redux to detect the changes.
@@ -12,7 +13,8 @@ class BudgetAppState {
       this.isLoading,
       this.isCreateNewBudgetValid,
       this.selectedMonthRecord,
-      this.applicationTheme});
+      this.applicationTheme,
+      this.recurringRecords});
 
   final List<HomeBudgetOverview> monthRecords;
   final HomeBudgetMetrics budgetMetrics;
@@ -20,6 +22,7 @@ class BudgetAppState {
   final bool isCreateNewBudgetValid;
   final HomeBudgetOverview selectedMonthRecord;
   final ThemeData applicationTheme;
+  final List<BudgetDetails> recurringRecords;
 
   BudgetAppState clone(
       {final List<HomeBudgetOverview> monthRecords,
@@ -27,7 +30,8 @@ class BudgetAppState {
       final bool isLoading,
       final bool isCreateNewBudgetValid,
       final HomeBudgetOverview selectedMonthRecord,
-      final ThemeData applicationTheme}) {
+      final ThemeData applicationTheme,
+      final List<BudgetDetails> recurringRecords}) {
     return BudgetAppState(
         applicationTheme: applicationTheme ?? this.applicationTheme,
         monthRecords: monthRecords ?? this.monthRecords,
@@ -39,6 +43,7 @@ class BudgetAppState {
             ? this.selectedMonthRecord
             : selectedMonthRecord.markAsDelete
                 ? null
-                : selectedMonthRecord);
+                : selectedMonthRecord,
+        recurringRecords: recurringRecords ?? this.recurringRecords);
   }
 }
