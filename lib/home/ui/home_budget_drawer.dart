@@ -54,7 +54,7 @@ class _MyHomeBudgetDrawerState extends State<MyHomeBudgetDrawer> {
     return Column(
       children: <Widget>[
         DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.cyan),
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: Center(
               child: Container(
                   child: const Text(

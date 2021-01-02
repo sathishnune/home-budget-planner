@@ -390,3 +390,4 @@ hs_err_pid*
 /android/.idea/caches/*.ser
 /android/.idea/*.xml
 /android/.idea/libraries/*.xml
+assets/gdriveconfig.yaml
