@@ -107,7 +107,6 @@ class _EditFormState extends State<EditForm> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Radio<String>(
-                            activeColor: Theme.of(context).primaryColor,
                             value: 'Credit',
                             groupValue: _transactionType,
                             onChanged: (String value) => {
@@ -122,7 +121,6 @@ class _EditFormState extends State<EditForm> {
                           ),
                           Radio<String>(
                               value: 'Debit',
-                              activeColor: Theme.of(context).primaryColor,
                               groupValue: _transactionType,
                               onChanged: (String value) => {
                                     setState(() {

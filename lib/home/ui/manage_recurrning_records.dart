@@ -39,21 +39,12 @@ class ManageRecurringList extends StatelessWidget {
               ),
             );
           } else {
-            return Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Recurring records to repeated in each month'),
-                ),
-                Column(
-                  children: storeDetails.recurringRecords
-                      .map(
-                        (BudgetDetails budgetDetails) =>
-                            budgetCardItemBuilder(budgetDetails, context, true),
-                      )
-                      .toList(),
-                )
-              ],
+            return ListView.builder(
+              itemCount: storeDetails.recurringRecords.length,
+              itemBuilder: (BuildContext context, int index) {
+                return budgetCardItemBuilder(
+                    storeDetails.recurringRecords[index], context, true);
+              },
             );
           }
         });

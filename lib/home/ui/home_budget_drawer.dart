@@ -53,26 +53,21 @@ class _MyHomeBudgetDrawerState extends State<MyHomeBudgetDrawer> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        const UserAccountsDrawerHeader(
-            currentAccountPicture: CircleAvatar(
-              child: Text('SN'),
-            ),
-            accountName: Text('Sathish Nune'),
-            accountEmail: Text('Sathish8103@gmail.com')),
+        DrawerHeader(
+            decoration: const BoxDecoration(color: Colors.cyan),
+            child: Center(
+              child: Container(
+                  child: const Text(
+                'Home Budget Application',
+                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 20),
+              )),
+            )),
         ListTile(
           leading: const Icon(Icons.add_rounded),
           title: const Text('Create new budget'),
           onTap: () {
             Navigator.pop(context);
             createNewBudget(context);
-          },
-        ),
-        const Divider(thickness: 2),
-        ListTile(
-          leading: const Icon(Icons.settings),
-          title: const Text('Settings'),
-          onTap: () {
-            _onSettingButtonPress(context);
           },
         ),
         const Divider(thickness: 2),
@@ -92,6 +87,14 @@ class _MyHomeBudgetDrawerState extends State<MyHomeBudgetDrawer> {
           leading: const Icon(Icons.backup),
           title: const Text('Backup & Restore'),
           onTap: () => _backupRestore(context),
+        ),
+        const Divider(thickness: 2),
+        ListTile(
+          leading: const Icon(Icons.settings),
+          title: const Text('Settings'),
+          onTap: () {
+            _onSettingButtonPress(context);
+          },
         ),
         const Divider(thickness: 2),
       ],

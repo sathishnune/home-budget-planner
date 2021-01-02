@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:home_budget_app/home/model/home_budget_monthly_details.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -16,6 +16,7 @@ class DBUtils {
   static const String TABLE_HOME_RECURRING_BUDGET = 'HOME_BUDGET_RECURRING';
   static const String TABLE_HOME_BUDGET_MONTHLY_DETAILS =
       'HOME_BUDGET_MONTHLY_DETAILS';
+  static const String TABLE_HOME_BUDGET_BACK_UP = 'HOME_BUDGET_BACK_UP';
 
   static const String SQL_CREATE_HOME_DETAILS_OVERVIEW =
       'CREATE TABLE HOME_BUDGET_OVERVIEW(id TEXT PRIMARY KEY, month INTEGER, '
@@ -23,6 +24,9 @@ class DBUtils {
 
   static const String SQL_CREATE_HOME_DETAILS_THEME =
       'CREATE TABLE HOME_BUDGET_THEME(colorCode INTEGER)';
+
+  static const String SQL_CREATE_HOME_BUDGET_BACK_UP =
+      'CREATE TABLE HOME_BUDGET_BACK_UP(last_back_up TEXT)';
 
   static const String SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS =
       'CREATE TABLE HOME_BUDGET_MONTHLY_DETAILS(id TEXT PRIMARY KEY, '
@@ -39,15 +43,12 @@ class DBUtils {
         onCreate: (Database db, int version) => _createTables(db), version: 1);
   }
 
-  static void getDataBaseFile1() {
-    getDatabasesPath().then((String value) => debugPrint('value: ' + value));
-  }
-
   static void _createTables(Database db) {
     db.execute(SQL_CREATE_HOME_DETAILS_OVERVIEW);
     db.execute(SQL_CREATE_HOME_BUDGET_MONTHLY_DETAILS);
     db.execute(SQL_CREATE_HOME_DETAILS_THEME);
     db.execute(SQL_CREATE_HOME_BUDGET_RECURRING_DETAILS);
+    db.execute(SQL_CREATE_HOME_BUDGET_BACK_UP);
   }
 
   static Future<void> insertHomeBudgetOverview(
@@ -224,7 +225,6 @@ class DBUtils {
       final Map<String, dynamic> row = <String, dynamic>{
         'colorCode': colorCode
       };
-      debugPrint(value.toString());
       if (value.isEmpty) {
         await db.insert(TABLE_HOME_BUDGET_THEME, row);
       } else {
@@ -237,5 +237,35 @@ class DBUtils {
     final Database db = await database();
     return await db.query(TABLE_HOME_BUDGET_THEME,
         columns: ['colorCode'], limit: 1);
+  }
+
+  static Future<void> insertOrUpdateBackupTimeStamp() async {
+    final Database db = await database();
+    final List<Map<String, dynamic>> data =
+        await db.query(TABLE_HOME_BUDGET_BACK_UP);
+    final Map<String, dynamic> row = <String, dynamic>{
+      'last_back_up': currentTimeStamp()
+    };
+    if (data.isNotEmpty) {
+      await db.update(TABLE_HOME_BUDGET_BACK_UP, row);
+    } else {
+      await db.insert(TABLE_HOME_BUDGET_BACK_UP, row);
+    }
+  }
+
+  static Future<String> lastBackUpTimeStamp() async {
+    final Database db = await database();
+    final List<Map<String, dynamic>> data =
+        await db.query(TABLE_HOME_BUDGET_BACK_UP);
+    if (data.isNotEmpty) {
+      return Utils.cast<String>(data.first['last_back_up']);
+    }
+    return null;
+  }
+
+  static String currentTimeStamp() {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat.yMd().add_jm();
+    return formatter.format(now);
   }
 }

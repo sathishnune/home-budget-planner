@@ -1,4 +1,3 @@
-import 'package:home_budget_app/home/database/database_util.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
 import 'package:home_budget_app/home/redux/actions.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
@@ -101,6 +100,9 @@ BudgetAppState applicationReducer(BudgetAppState currentState, dynamic action) {
     case EditRecurringRecord:
       return updateRecurringRecord(
           currentState, Utils.cast<BudgetDetails>(action.recurringRecord));
+
+    case BackupData:
+      return updateBackUpState(action, currentState);
 
     default:
       return currentState;
@@ -216,4 +218,11 @@ BudgetAppState addRecordToState(BudgetAppState currentState, dynamic action) {
   return currentState.clone(
       selectedMonthRecord: currentState.selectedMonthRecord,
       budgetMetrics: updateTotalAmountsRef(listOfMonthRecords));
+}
+
+BudgetAppState updateBackUpState(dynamic action, BudgetAppState currentState) {
+  return currentState.clone(
+      backupMessage: Utils.cast(action.message),
+      isProgress: Utils.cast(action.isProgress),
+      lastBackUpTime: Utils.cast(action.lastBackupTime));
 }

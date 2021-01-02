@@ -387,3 +387,6 @@ hs_err_pid*
 /android/.idea/misc.xml
 /android/.idea/modules.xml
 /ios/.gitignore
+/android/.idea/caches/*.ser
+/android/.idea/*.xml
+/android/.idea/libraries/*.xml

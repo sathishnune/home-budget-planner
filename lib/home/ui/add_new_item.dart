@@ -99,7 +99,6 @@ class AddRecordFormState extends State<AddRecordForm> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Radio<String>(
-                      activeColor: Theme.of(context).primaryColor,
                       value: 'Credit',
                       groupValue: _transactionType,
                       onChanged: (String value) => {
@@ -113,7 +112,6 @@ class AddRecordFormState extends State<AddRecordForm> {
                       style: TextStyle(fontSize: 18.0),
                     ),
                     Radio<String>(
-                        activeColor: Theme.of(context).primaryColor,
                         value: 'Debit',
                         groupValue: _transactionType,
                         onChanged: (String value) => {

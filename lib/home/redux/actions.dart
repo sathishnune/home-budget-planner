@@ -93,4 +93,12 @@ class DeleteRecurringRecord {
   final BudgetDetails recurringRecord;
 }
 
+class BackupData {
+  BackupData({this.isProgress, this.message, this.lastBackupTime});
+
+  final bool isProgress;
+  final String message;
+  final String lastBackupTime;
+}
+
 class SuperClass {}

@@ -101,10 +101,14 @@ class _HomeWidgetState extends State<HomeWidget> {
           null != value.first.entries &&
           null != value.first.entries.first &&
           null != value.first.entries.first.value) {
-        final int colorCode =
-            Utils.cast<int>(value.first.entries.first.value);
-        DynamicTheme.of(context).setThemeData(
-            ThemeData(primaryColor: Color(colorCode ?? Colors.green.value)));
+        final int colorCode = Utils.cast<int>(value.first.entries.first.value);
+        if (7923945 == colorCode) {
+          DynamicTheme.of(context)
+              .setThemeData(ThemeData(brightness: Brightness.dark));
+        } else {
+          DynamicTheme.of(context).setThemeData(
+              ThemeData(primaryColor: Color(colorCode ?? Colors.green.value)));
+        }
       }
     });
   }

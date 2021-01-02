@@ -128,6 +128,9 @@ class _SettingsState extends State<Settings> {
     if (darkTheme) {
       DynamicTheme.of(context)
           .setThemeData(ThemeData(brightness: Brightness.dark));
+
+      DBUtils.updateColorCodeForAppTheme(7923945)
+          .then((void value) => print('saving is done..'));
     } else {
       DynamicTheme.of(context)
           .setThemeData(ThemeData(brightness: Brightness.light));
@@ -138,10 +141,7 @@ class _SettingsState extends State<Settings> {
     super.didChangeDependencies();
     DynamicTheme.of(context).setThemeData(ThemeData(primaryColor: pickerColor));
     currentColor = pickerColor;
-    final Store<BudgetAppState> _state =
-        StoreProvider.of<BudgetAppState>(context);
-    debugPrint('saving value' + currentColor.value.toString());
     DBUtils.updateColorCodeForAppTheme(currentColor.value)
-        .then((value) => debugPrint("saving is done.."));
+        .then((void value) => print('saving is done..'));
   }
 }

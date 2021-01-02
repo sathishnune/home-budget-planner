@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_budget_app/home/database/backup_restore.dart';
 import 'package:home_budget_app/home/database/database_util.dart';
 import 'package:home_budget_app/home/model/home_budget_monthly_details.dart';
 import 'package:home_budget_app/home/model/home_budget_overview.dart';
@@ -129,14 +130,10 @@ ThunkAction<BudgetAppState> addNewMonthlyBudget(
                 i++;
               });
               budgetOverview.listOfMonthRecords = value;
-              if (DateTime.now().year == selectedDate.year) {
-                store.dispatch(InsertHomeBudgetOverview(budgetOverview));
-              }
+              store.dispatch(InsertHomeBudgetOverview(budgetOverview));
             });
           } else {
-            if (DateTime.now().year == selectedDate.year) {
-              store.dispatch(InsertHomeBudgetOverview(budgetOverview));
-            }
+            store.dispatch(InsertHomeBudgetOverview(budgetOverview));
           }
         });
 
@@ -208,5 +205,37 @@ ThunkAction<BudgetAppState> updateRecordStatus(String id, bool status) {
   return (Store<BudgetAppState> store) async {
     await DBUtils.updateRecordStatus(id, status);
     store.dispatch(UpdateStatus(isCompleted: status, id: id));
+  };
+}
+
+ThunkAction<BudgetAppState> restoreDB() {
+  return (Store<BudgetAppState> store) async {
+    store.dispatch(BackupData(isProgress: true, message: 'Restore started'));
+    BackupUtils.restoreDBFile().then((void value) {
+      store.dispatch(
+          BackupData(isProgress: false, message: 'Restore completed'));
+    });
+  };
+}
+
+ThunkAction<BudgetAppState> backupDB() {
+  return (Store<BudgetAppState> store) async {
+    store.dispatch(
+        BackupData(isProgress: true, message: 'Backup process started'));
+    BackupUtils.backupFile().then((void value) {
+      DBUtils.insertOrUpdateBackupTimeStamp();
+      store.dispatch(BackupData(
+          isProgress: false,
+          message: 'Backup completed',
+          lastBackupTime: DBUtils.currentTimeStamp()));
+    });
+  };
+}
+
+ThunkAction<BudgetAppState> refreshLastBackupTime() {
+  return (Store<BudgetAppState> store) async {
+    DBUtils.lastBackUpTimeStamp().then((String value) {
+      store.dispatch(BackupData(lastBackupTime: value, message: 'NV'));
+    });
   };
 }

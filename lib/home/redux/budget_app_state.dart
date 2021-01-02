@@ -14,7 +14,10 @@ class BudgetAppState {
       this.isCreateNewBudgetValid,
       this.selectedMonthRecord,
       this.applicationTheme,
-      this.recurringRecords});
+      this.recurringRecords,
+      this.backupMessage,
+      this.isProgress,
+      this.lastBackUpTime});
 
   final List<HomeBudgetOverview> monthRecords;
   final HomeBudgetMetrics budgetMetrics;
@@ -23,6 +26,9 @@ class BudgetAppState {
   final HomeBudgetOverview selectedMonthRecord;
   final ThemeData applicationTheme;
   final List<BudgetDetails> recurringRecords;
+  final String backupMessage;
+  final bool isProgress;
+  final String lastBackUpTime;
 
   BudgetAppState clone(
       {final List<HomeBudgetOverview> monthRecords,
@@ -31,7 +37,10 @@ class BudgetAppState {
       final bool isCreateNewBudgetValid,
       final HomeBudgetOverview selectedMonthRecord,
       final ThemeData applicationTheme,
-      final List<BudgetDetails> recurringRecords}) {
+      final List<BudgetDetails> recurringRecords,
+      final String backupMessage,
+      final bool isProgress,
+      final String lastBackUpTime}) {
     return BudgetAppState(
         applicationTheme: applicationTheme ?? this.applicationTheme,
         monthRecords: monthRecords ?? this.monthRecords,
@@ -44,6 +53,9 @@ class BudgetAppState {
             : selectedMonthRecord.markAsDelete
                 ? null
                 : selectedMonthRecord,
-        recurringRecords: recurringRecords ?? this.recurringRecords);
+        recurringRecords: recurringRecords ?? this.recurringRecords,
+        isProgress: isProgress ?? this.isProgress,
+        backupMessage: backupMessage ?? this.backupMessage,
+        lastBackUpTime: lastBackUpTime ?? this.lastBackUpTime);
   }
 }
