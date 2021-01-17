@@ -189,7 +189,7 @@ class MyHomeBudgetAppBody extends StatelessWidget {
       padding: EdgeInsets.all(16.0),
       child: Text(
         'Details not available. Please create records.',
-        style: TextStyle(fontSize: 18),
+        style: TextStyle(fontSize: 18, color: Colors.white70),
       ),
     ));
   }
@@ -225,30 +225,38 @@ class MyHomeBudgetAppBody extends StatelessWidget {
       distinct: true,
       converter: (Store<BudgetAppState> storeDetails) => storeDetails.state,
       builder: (BuildContext context, BudgetAppState storeDetails) {
-        return Column(
-          children: <Widget>[
-            if (storeDetails.selectedMonthRecord == null)
-              _noBudgetSelected(context),
-            if (storeDetails.selectedMonthRecord != null)
-              SummaryCards(
-                  budgetMetrics: storeDetails.budgetMetrics,
-                  selectedMonthRecord: storeDetails.selectedMonthRecord),
-            if (storeDetails.selectedMonthRecord != null) HorizontalLine(),
-            if (storeDetails.isLoading)
-              const LinearProgressIndicator()
-            else
-              Container(),
-            if (storeDetails.selectedMonthRecord != null)
-              Expanded(
-                child: (null ==
-                            storeDetails
-                                .selectedMonthRecord.listOfMonthRecords ||
-                        storeDetails
-                            .selectedMonthRecord.listOfMonthRecords.isEmpty)
-                    ? _noDetailsMonthlyBudget()
-                    : buildReOrderedListView(context, storeDetails),
-              )
-          ],
+        return Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/details_background.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Column(
+            children: <Widget>[
+              if (storeDetails.selectedMonthRecord == null)
+                _noBudgetSelected(context),
+              if (storeDetails.selectedMonthRecord != null)
+                SummaryCards(
+                    budgetMetrics: storeDetails.budgetMetrics,
+                    selectedMonthRecord: storeDetails.selectedMonthRecord),
+              if (storeDetails.selectedMonthRecord != null) HorizontalLine(),
+              if (storeDetails.isLoading)
+                const LinearProgressIndicator()
+              else
+                Container(),
+              if (storeDetails.selectedMonthRecord != null)
+                Expanded(
+                  child: (null ==
+                              storeDetails
+                                  .selectedMonthRecord.listOfMonthRecords ||
+                          storeDetails
+                              .selectedMonthRecord.listOfMonthRecords.isEmpty)
+                      ? _noDetailsMonthlyBudget()
+                      : buildReOrderedListView(context, storeDetails),
+                )
+            ],
+          ),
         );
       },
     );

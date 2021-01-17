@@ -20,12 +20,15 @@ class _SummaryCardsState extends State<SummaryCards> {
     return Row(
       children: <Widget>[
         Container(
-          width: MediaQuery.of(context).size.width * 0.9,
+          width: MediaQuery.of(context).size.width,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "Home Budget Plan for Month of: ${null == widget.selectedMonthRecord ? 'N/A' : widget.selectedMonthRecord.displayName}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70),
             ),
           ),
         )
@@ -36,7 +39,12 @@ class _SummaryCardsState extends State<SummaryCards> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black12,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/summary_background.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Column(
         children: <Widget>[
           _getTitleOfSummary(),
@@ -56,8 +64,8 @@ class _SummaryCardsState extends State<SummaryCards> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              _getSummaryCard(context, Icons.account_balance_wallet,
-                  Colors.blue, 'Balance', widget.budgetMetrics.remainingAmount)
+              _getSummaryCard(context, Icons.account_balance,
+                  Colors.black, 'Balance', widget.budgetMetrics.remainingAmount)
             ],
           ),
         ],
