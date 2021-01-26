@@ -103,53 +103,59 @@ Widget budgetCardItemBuilder(
       //color: Colors.white70,
       child: ClipPath(
         child: Container(
-          height: 120,
+          height: 90,
           child: Column(
             children: <Widget>[
-              ListTile(
-                isThreeLine: false,
-                title: Text(budgetDetails.title),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit,
-                      color: Theme.of(context).iconTheme.color),
-                  onPressed: () => <void>{
-                    if (budgetDetails != null)
-                      <void>{
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    EditFullScreenDialog(
-                                        budgetDetails: budgetDetails,
-                                        isRecurringBudget: isRecurringBudget),
-                                fullscreenDialog: true))
-                      }
-                  },
+              Container(
+                height: 40,
+                child: ListTile(
+                  isThreeLine: false,
+                  title: Text(budgetDetails.title),
+                  trailing: IconButton(
+                    icon: Icon(Icons.edit,
+                        color: Theme.of(context).iconTheme.color),
+                    onPressed: () => <void>{
+                      if (budgetDetails != null)
+                        <void>{
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      EditFullScreenDialog(
+                                          budgetDetails: budgetDetails,
+                                          isRecurringBudget: isRecurringBudget),
+                                  fullscreenDialog: true))
+                        }
+                    },
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 0.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, bottom: 5),
-                      child: Text(
-                          'Amount: $_rupeeSymbol${formatNumber(budgetDetails.amount)}'),
-                    ),
-                    const Spacer(),
-                    _statusSwitch(budgetDetails, isRecurringBudget),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: IconButton(
-                          icon: Icon(Icons.delete_rounded,
-                              color: Theme.of(context).iconTheme.color),
-                          onPressed: () => <void>{
-                                deleteBudgetListItem(
-                                    context, budgetDetails, isRecurringBudget)
-                              }),
-                    ),
-                  ],
+              Container(
+                height: 50,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, bottom: 5),
+                        child: Text(
+                            'Amount: $_rupeeSymbol${formatNumber(budgetDetails.amount)}'),
+                      ),
+                      const Spacer(),
+                      _statusSwitch(budgetDetails, isRecurringBudget),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: IconButton(
+                            icon: Icon(Icons.delete_rounded,
+                                color: Theme.of(context).iconTheme.color),
+                            onPressed: () => <void>{
+                                  deleteBudgetListItem(
+                                      context, budgetDetails, isRecurringBudget)
+                                }),
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],

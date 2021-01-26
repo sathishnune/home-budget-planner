@@ -106,7 +106,7 @@ class _SummaryCardsState extends State<SummaryCards> {
                     child: RichText(
                       text: TextSpan(
                           style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
+                              fontSize: 13, fontWeight: FontWeight.bold),
                           children: <TextSpan>[
                             TextSpan(
                                 text: '$transType: ',

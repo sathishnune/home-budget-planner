@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:home_budget_app/home/redux/budget_app_state.dart';
-import 'package:home_budget_app/home/ui/budget_details.dart';
 import 'package:home_budget_app/home/ui/utilities.dart';
 import 'package:redux/redux.dart';
 
